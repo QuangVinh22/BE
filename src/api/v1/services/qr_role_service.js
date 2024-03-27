@@ -1,0 +1,100 @@
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
+const {
+  BadRequestError,
+  ConflictRequestError,
+  NotFoundError,
+} = require("../../core/error.response");
+module.exports = {
+  getQRRoleService: async (queryParams) => {
+    const { id, page, limit } = queryParams;
+
+    // Kiểm tra xem có truyền ID cụ thể không
+    if (id) {
+      // Fetch QRRole by ID
+      const holderQRRole = await prisma.qr_role.findUnique({
+        where: { id: parseInt(id), status: true },
+      });
+      if (!holderQRRole) throw new BadRequestError("Id QRRole  không tồn tại");
+      return [holderQRRole]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
+    }
+
+    // Fetch all with pagination
+    const pageNum = parseInt(page) || 1; // Mặc định là trang 1 nếu không được cung cấp
+    const pageSize = parseInt(limit) || 10; // Mặc định 10 sản phẩm mỗi trang nếu không được cung cấp
+    const skip = (pageNum - 1) * pageSize;
+
+    const QRRole = await prisma.qr_role.findMany({
+      skip: skip,
+      take: pageSize,
+      where: {
+        status: true,
+      },
+    });
+
+    return QRRole;
+  },
+  createQRRolesService: async (QRRole) => {
+    const newQRRole = await prisma.qr_role.create({
+      data: {
+        franchise_id: QRRole.franchise_id,
+        max_qr_codes: QRRole.max_qr_codes,
+        role_id: QRRole.role_id,
+        created_by: QRRole.created_by,
+        status: QRRole.status,
+      },
+    });
+    return newQRRole;
+  },
+  putQRRoleService: async (QRRoleData) => {
+    const vatAmount = QRRoleData.price * (QRRoleData.vat / 100);
+    const cost = QRRoleData.price + vatAmount;
+    const totalAfterDiscount = cost - cost * (QRRoleData.discount / 100);
+    const holderUpdatedBy = await prisma.users.findUnique({
+      where: {
+        id: QRRoleData.updated_by,
+      },
+    });
+
+    if (!holderUpdatedBy) {
+      throw new NotFoundError("Ko tìm thấy sửa bởi User nào");
+    }
+    const updateQRRole = await prisma.qr_role.update({
+      where: {
+        id: QRRoleData.id,
+      },
+      data: {
+        franchise_id: QRRoleData.franchise_id,
+        max_qr_codes: QRRoleData.max_qr_codes,
+        role_id: QRRoleData.role_id,
+        updated_by: QRRoleData.updated_by,
+        status: QRRoleData.status,
+      },
+    });
+    if (!updateQRRole) throw new NotFoundError("Ko tìm thấy ID QRRole cần sửa");
+    return updateQRRole;
+  },
+  //   deleteProductService: async (QRRoleData) => {
+  //     const existingProduct = await prisma.QRRoles.findUnique({
+  //       where: {
+  //         id: QRRoleData.id,
+  //       },
+  //     });
+
+  //     // Nếu không tìm thấy sản phẩm, ném ra lỗi
+  //     if (!existingProduct) {
+  //       throw new BadRequestError("Ko tìm thấy ID Sản Phẩm cần xóa");
+  //     }
+
+  //     // Nếu sản phẩm tồn tại, thực hiện soft delete bằng cách cập nhật trạng thái thành false
+  //     const updateQRRole= await prisma.QRRoles.update({
+  //       where: {
+  //         id: QRRoleData.id,
+  //       },
+  //       data: {
+  //         status: false,
+  //       },
+  //     });
+  //     return updatedProduct;
+  //   },
+};

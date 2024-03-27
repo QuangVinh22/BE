@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "products" ALTER COLUMN "created_time" SET DEFAULT CURRENT_TIMESTAMP;

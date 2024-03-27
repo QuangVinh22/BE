@@ -1,0 +1,278 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_CONNECTIONSTRING")
+}
+
+model users {
+  created_by                                                   Int?
+  created_time                                                 DateTime?          @default(now())
+  email                                                        String             @unique
+  franchies_id                                                 Int?
+  id                                                           Int                @id @default(autoincrement())
+  password                                                     String
+  role_id                                                      Int?
+  status                                                       Boolean?
+  updated_by                                                   Int?
+  updated_time                                                 DateTime? @db.Timestamp(6) @updatedAt
+  username                                                     String             @db.VarChar
+  catalogue_catalogue_created_byTousers                        catalogue[]        @relation("catalogue_created_byTousers")
+  catalogue_catalogue_updated_byTousers                        catalogue[]        @relation("catalogue_updated_byTousers")
+  floors_floors_created_byTousers                              floors[]           @relation("floors_created_byTousers")
+  floors_floors_updated_byTousers                              floors[]           @relation("floors_updated_byTousers")
+  franchise                                                    franchise[]
+  menu_products_menu_products_created_byTousers                menu_products[]    @relation("menu_products_created_byTousers")
+  menu_products_menu_products_updated_byTousers                menu_products[]    @relation("menu_products_updated_byTousers")
+  menu_role_menu_role_created_byTousers                        menu_role[]        @relation("menu_role_created_byTousers")
+  menu_role_menu_role_updated_byTousers                        menu_role[]        @relation("menu_role_updated_byTousers")
+  orders_detail_orders_detail_created_byTousers                orders_detail[]    @relation("orders_detail_created_byTousers")
+  orders_detail_orders_detail_updated_byTousers                orders_detail[]    @relation("orders_detail_updated_byTousers")
+  products_products_created_byTousers                          products[]         @relation("products_created_byTousers")
+  products_products_updated_byTousers                          products[]         @relation("products_updated_byTousers")
+  role_role_created_byTousers                                  role[]             @relation("role_created_byTousers")
+  role_role_updated_byTousers                                  role[]             @relation("role_updated_byTousers")
+  role_permissions_role_permissions_created_byTousers          role_permissions[] @relation("role_permissions_created_byTousers")
+  role_permissions_role_permissions_updated_byTousers          role_permissions[] @relation("role_permissions_updated_byTousers")
+  tables_tables_created_byTousers                              tables[]           @relation("tables_created_byTousers")
+  tables_tables_updated_byTousers                              tables[]           @relation("tables_updated_byTousers")
+  role_users_role_idTorole                                     role?              @relation("users_role_idTorole", fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_users_role")
+  }
+
+model catalogue {
+  id                                Int             @id @default(autoincrement())
+  description                       String?         @db.VarChar
+  image                             String?
+  updated_time                      DateTime?       @db.Timestamp(6) @updatedAt
+  created_time                      DateTime?       @db.Timestamp(6) @default(now())
+  updated_by                        Int?
+  created_by                        Int?
+  status                            Boolean?
+  users_catalogue_created_byTousers users?          @relation("catalogue_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_catalogue_created_by")
+  users_catalogue_updated_byTousers users?          @relation("catalogue_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_catalogue_updated_by")
+  menu_products                     menu_products[]
+}
+
+model floors {
+  id                                       Int         @id @default(autoincrement())
+  franchise_id                             Int?
+  floor_number                             Int?
+  floor_name                               String?     @db.VarChar
+  description                              String?     @db.VarChar
+  updated_time                             DateTime?   @db.Timestamp(6) @updatedAt
+  created_time                             DateTime?   @db.Timestamp(6) @default(now())
+  updated_by                               Int?
+  created_by                               Int?
+  status                                   Boolean?
+  users_floors_created_byTousers           users?      @relation("floors_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_floors_created_by")
+  franchise_floors_franchise_idTofranchise franchise?  @relation("floors_franchise_idTofranchise", fields: [franchise_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_floors_franchise")
+  users_floors_updated_byTousers           users?      @relation("floors_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_floors_updated_by")
+  franchise_franchise_floor_idTofloors     franchise[] @relation("franchise_floor_idTofloors")
+  orders                                   orders[]
+  tables                                   tables[]
+}
+
+model franchise {
+  id                                    Int       @id @default(autoincrement())
+  user_id                               Int?
+  floor_id                              Int?
+  name                                  String    @db.VarChar
+  address                               String?   @db.VarChar
+  phone_number                          String?   @db.VarChar
+  updated_time                          DateTime? @db.Timestamp(6) @updatedAt
+  created_time                          DateTime? @db.Timestamp(6) @default(now())
+  updated_by                            Int?
+  created_by                            Int?
+  status                                Boolean?
+  floors_floors_franchise_idTofranchise floors[]  @relation("floors_franchise_idTofranchise")
+  floors_franchise_floor_idTofloors     floors?   @relation("franchise_floor_idTofloors", fields: [floor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_franchise_floor")
+  users                                 users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_franchise_user")
+  orders                                orders[]
+  qr_role                               qr_role[]
+}
+
+model menu_products {
+  id                                    Int        @id @default(autoincrement())
+  name                                  String     @db.VarChar
+  product_id                            Int?
+  catalogue_id                          Int?
+  updated_time                          DateTime? @db.Timestamp(6) @updatedAt 
+  created_time                          DateTime? @db.Timestamp(6) @default(now()) 
+  updated_by                            Int?
+  created_by                            Int?
+  status                                Boolean?
+  users_menu_products_created_byTousers users?     @relation("menu_products_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_menu_products_created_by")
+  users_menu_products_updated_byTousers users?     @relation("menu_products_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_menu_products_updated_by")
+  catalogue                             catalogue? @relation(fields: [catalogue_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  products                              products?  @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model menu_role {
+  id                                Int              @id @default(autoincrement())
+  role_permissions_id               Int
+  function_url                      String           @db.VarChar
+  function_name                     String           @db.VarChar
+  updated_time                      DateTime?        @db.Timestamp(6) @updatedAt 
+  created_time                      DateTime?        @db.Timestamp(6) @default(now())
+  updated_by                        Int?
+  created_by                        Int?
+  status                            Boolean?
+  users_menu_role_created_byTousers users?           @relation("menu_role_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_menu_role_created_by")
+  users_menu_role_updated_byTousers users?           @relation("menu_role_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_menu_role_updated_by")
+  role_permissions                  role_permissions @relation(fields: [role_permissions_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model orders {
+  id                   Int             @id @default(autoincrement())
+  franchise_id         Int?
+  floor_id             Int?
+  table_id             Int?
+  payment_method_id    Int?
+  price                Float?
+  vat                  Float?
+  cost                 Float?
+  discount             Float?
+  total_after_discount Float?
+  updated_time         DateTime?        @db.Timestamp(6) @updatedAt 
+  created_time         DateTime?        @db.Timestamp(6) @default(now()) 
+  updated_by           Int?
+  created_by           Int?
+  status               Boolean?
+  floors               floors?         @relation(fields: [floor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_floor")
+  franchise            franchise?      @relation(fields: [franchise_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_franchise")
+  payment_method       payment_method? @relation(fields: [payment_method_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_payment_method")
+  tables               tables?         @relation(fields: [table_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_table")
+  orders_detail        orders_detail[]
+  qr                   qr[]
+}
+
+model orders_detail {
+  id                                    Int       @id @default(autoincrement())
+  order_id                              Int?
+  product_id                            Int?
+  quantity                              Int?
+  price_per_unit                        Float?
+  total_price                           Float?
+  price                                 Float?
+  vat                                   Float?
+  cost                                  Float?
+  discount                              Float?
+  total_after_discount                  Float?
+  updated_time                          DateTime? @db.Timestamp(6)  @updatedAt
+  created_time                          DateTime? @db.Timestamp(6)  @default(now())
+  updated_by                            Int?
+  created_by                            Int?
+  status                                Boolean?
+  users_orders_detail_created_byTousers users?    @relation("orders_detail_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_detail_created_by")
+  orders                                orders?   @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_detail_order")
+  products                              products? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_detail_product")
+  users_orders_detail_updated_byTousers users?    @relation("orders_detail_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_detail_updated_by")
+}
+
+model payment_method {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar
+  description String?  @db.VarChar
+  updated_time                      DateTime?        @db.Timestamp(6) @updatedAt 
+  created_time                      DateTime?        @db.Timestamp(6) @default(now())
+  updated_by                        Int?
+  created_by                        Int?
+  status      Boolean?
+  orders      orders[]
+}
+
+model products {
+  id                               Int             @id @default(autoincrement())
+  name                             String          @db.VarChar
+  description                      String?         @db.VarChar
+  image                            String?
+  price                            Float?
+  vat                              Float?
+  cost                             Float?
+  updated_time                     DateTime?       @db.Timestamp(6) @updatedAt
+  created_time                     DateTime?       @db.Timestamp(6) @default(now())
+  updated_by                       Int?
+  created_by                       Int?
+  status                           Boolean?
+  menu_products                    menu_products[]
+  orders_detail                    orders_detail[]
+  users_products_created_byTousers users?          @relation("products_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_products_created_by")
+  users_products_updated_byTousers users?          @relation("products_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_products_updated_by")
+}
+
+model qr {
+  id           Int       @id @default(autoincrement())
+  order_id     Int?
+  table_id     Int?
+  updated_time DateTime? @db.Timestamp(6)   @updatedAt
+  created_time DateTime? @db.Timestamp(6)   @default(now())
+  updated_by   Int?
+  created_by   Int?
+  status       Boolean?
+  orders       orders?   @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_qr_order")
+  tables       tables?   @relation(fields: [table_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_qr_table")
+}
+
+model qr_role {
+  id           Int        @id @default(autoincrement())
+  franchise_id Int?
+  max_qr_codes Int?
+  role_id      Int?
+  updated_time DateTime?  @db.Timestamp(6)  @updatedAt
+  created_time DateTime?  @db.Timestamp(6)  @default(now())
+  updated_by   Int?
+  created_by   Int?
+  status       Boolean?
+  franchise    franchise? @relation(fields: [franchise_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  role         role?      @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model role {
+  id                           Int                @id @default(autoincrement())
+  name                         String             @db.VarChar
+  description                  String?            @db.VarChar
+  updated_time                 DateTime?          @db.Timestamp(6)  @updatedAt
+  created_time                 DateTime?          @db.Timestamp(6)  @default(now())
+  updated_by                   Int?
+  created_by                   Int?               
+  status                       Boolean?
+  qr_role                      qr_role[]
+  users_role_created_byTousers users?             @relation("role_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role_created_by")
+  users_role_updated_byTousers users?             @relation("role_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role_updated_by")
+  role_permissions             role_permissions[]
+  users_users_role_idTorole    users[]            @relation("users_role_idTorole")
+}
+
+model role_permissions {
+  id                                                Int         @id @default(autoincrement())
+  role_id                                           Int?
+  name                                              String?     
+  updated_time                                      DateTime?   @db.Timestamp(6)  @updatedAt
+  created_time                                      DateTime?   @db.Timestamp(6)  @default(now())
+  updated_by                                        Int?
+  created_by                                        Int?
+  status                                            Boolean?
+  menu_role                                         menu_role[]
+  users_role_permissions_created_byTousers          users?      @relation("role_permissions_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role_permissions_created_by")
+  users_role_permissions_updated_byTousers          users?      @relation("role_permissions_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_role_permissions_updated_by")
+  role                                              role?       @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+}
+
+model tables {
+  id                             Int       @id @default(autoincrement())
+  floor_id                       Int? 
+  table_numbers                  Int?
+  updated_time                   DateTime? @db.Timestamp(6) @updatedAt
+  created_time                   DateTime? @db.Timestamp(6) @default(now())
+  updated_by                     Int?
+  created_by                     Int?
+  status                         Boolean?
+  orders                         orders[]
+  qr                             qr[]
+  users_tables_created_byTousers users?    @relation("tables_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tables_created_by")
+  floors                         floors?   @relation(fields: [floor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tables_floor")
+  users_tables_updated_byTousers users?    @relation("tables_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tables_updated_by")
+}

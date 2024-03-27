@@ -1,0 +1,32 @@
+-- AlterTable
+ALTER TABLE "catalogue" ALTER COLUMN "created_time" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "floors" ALTER COLUMN "created_time" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "franchise" ALTER COLUMN "created_time" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "menu_products" ALTER COLUMN "created_time" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "menu_role" ALTER COLUMN "created_time" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "qr" ALTER COLUMN "created_time" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "qr_role" ALTER COLUMN "created_time" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "role" ALTER COLUMN "created_time" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "role_permissions" ALTER COLUMN "created_time" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "tables" ALTER COLUMN "created_time" SET DEFAULT CURRENT_TIMESTAMP;
+
+-- AlterTable
+ALTER TABLE "users" ALTER COLUMN "updated_time" SET DATA TYPE TIMESTAMP(6);
