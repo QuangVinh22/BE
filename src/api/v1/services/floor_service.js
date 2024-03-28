@@ -5,6 +5,12 @@ const {
   ConflictRequestError,
   NotFoundError,
 } = require("../../core/error.response");
+const {
+  validateRefFloor,
+  validateRefFranchise,
+  validatedUpdatedBy,
+  validateCreatedBy,
+} = require("../../middleware/validateReferencer");
 module.exports = {
   getFloorService: async (queryParams) => {
     const { id, page, limit } = queryParams;
@@ -36,18 +42,13 @@ module.exports = {
   },
   createFloorsService: async (Floor) => {
     //check coi Floor này được tạo bởi user nào
-    const holderCreatedBy = await prisma.users.findUnique({
-      where: {
-        id: Floor.created_by,
-      },
-    });
-    if (!holderCreatedBy) {
-      throw new NotFoundError("Ko tìm thấy tạo bởi User nào");
-    }
+    await validateCreatedBy(Floor.created_by);
+    //Check id chi nhánh muốn thêm có tồn tại k
+    await validateRefFranchise(Floor.franchise_id);
     const newFloor = await prisma.floors.create({
       data: {
         franchise_id: Floor.franchise_id,
-        floor_number: Floor.Floor_numbers,
+        floor_number: Floor.floor_number,
         floor_name: Floor.floor_name,
         description: Floor.description,
         created_by: Floor.created_by,
@@ -57,15 +58,11 @@ module.exports = {
     return newFloor;
   },
   putFloorService: async (FloorData) => {
-    const holderUpdatedBy = await prisma.users.findUnique({
-      where: {
-        id: FloorData.updated_by,
-      },
-    });
-
-    if (!holderUpdatedBy) {
-      throw new NotFoundError("Ko tìm thấy sửa bởi User nào");
-    }
+    await validatedUpdatedBy(FloorData.updated_by);
+    //check chi nhánh
+    await validateRefFranchise(FloorData.franchise_id);
+    //Check coi lầu muốn sửa có tồn tại k
+    await validateRefFloor(FloorData.id);
     const updateFloor = await prisma.floors.update({
       where: {
         id: FloorData.id,
@@ -79,7 +76,6 @@ module.exports = {
         status: FloorData.status,
       },
     });
-    if (!updateFloor) throw new NotFoundError("Ko tìm thấy ID Floor cần sửa");
     return updateFloor;
   },
   //   deleteProductService: async (FloorData) => {

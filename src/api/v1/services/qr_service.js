@@ -5,6 +5,13 @@ const {
   ConflictRequestError,
   NotFoundError,
 } = require("../../core/error.response");
+const {
+  validateRefOrder,
+  validateRefTable,
+  validateCreatedBy,
+  validatedUpdatedBy,
+  validateRefQR,
+} = require("../../middleware/validateReferencer");
 module.exports = {
   getQRService: async (queryParams) => {
     const { id, page, limit } = queryParams;
@@ -38,6 +45,12 @@ module.exports = {
     const vatAmount = QR.price * (QR.vat / 100);
     const cost = QR.price + vatAmount;
     const totalAfterDiscount = cost - cost * (QR.discount / 100);
+    //check Order ID
+    await validateRefOrder(QR.order_id);
+    //checkTable
+    await validateRefTable(QR.table_id);
+    //CreatedBy
+    await validateCreatedBy(QR.created_by);
     const newQR = await prisma.qr.create({
       data: {
         order_id: QR.order_id,
@@ -52,15 +65,14 @@ module.exports = {
     const vatAmount = QRData.price * (QRData.vat / 100);
     const cost = QRData.price + vatAmount;
     const totalAfterDiscount = cost - cost * (QRData.discount / 100);
-    const holderUpdatedBy = await prisma.users.findUnique({
-      where: {
-        id: QRData.updated_by,
-      },
-    });
-
-    if (!holderUpdatedBy) {
-      throw new NotFoundError("Ko tìm thấy sửa bởi User nào");
-    }
+    //checkupdate
+    await validatedUpdatedBy(QRData.updated_by);
+    //Order
+    await validateRefOrder(QRData.order_id);
+    //Check table is exist
+    await validateRefTable(QRData.table_id);
+    //
+    await validateRefQR(QRData.id);
     const updateQR = await prisma.qr.update({
       where: {
         id: QRData.id,
@@ -72,7 +84,6 @@ module.exports = {
         status: QRData.status,
       },
     });
-    if (!updateQR) throw new NotFoundError("Ko tìm thấy ID QR cần sửa");
     return updateQR;
   },
   //   deleteProductService: async (QRData) => {

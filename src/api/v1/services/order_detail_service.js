@@ -5,6 +5,13 @@ const {
   ConflictRequestError,
   NotFoundError,
 } = require("../../core/error.response");
+const {
+  validateRefOrder,
+  validateRefProduct,
+  validateCreatedBy,
+  validatedUpdatedBy,
+  validateRefOrderDetails,
+} = require("../../middleware/validateReferencer");
 module.exports = {
   getOrderDetailService: async (queryParams) => {
     const { id, page, limit } = queryParams;
@@ -36,6 +43,13 @@ module.exports = {
     return OrderDetail;
   },
   createOrderDetailsService: async (OrderDetail) => {
+    //validate OrderId isExist
+    await validateRefOrder(OrderDetail.order_id);
+    //validate ProductId isExist
+    await validateRefProduct(OrderDetail.product_id);
+    //validate User Createdby isExist
+    await validateCreatedBy(OrderDetail.created_by);
+    //
     const vatAmount = OrderDetail.price * (OrderDetail.vat / 100);
     const totalPrice = OrderDetail.price_per_unit * OrderDetail.quantity;
     const cost = OrderDetail.price + vatAmount;
@@ -59,6 +73,14 @@ module.exports = {
     return newOrderDetail;
   },
   putOrderDetailService: async (OrderDetailData) => {
+    //validate OrderId isExist
+    await validateRefOrder(OrderDetailData.order_id);
+    //validate ProductId isExist
+    await validateRefProduct(OrderDetailData.product_id);
+    //validate UpdatedBy isExist
+    await validatedUpdatedBy(OrderDetailData.updated_by);
+    //
+    await validateRefOrderDetails(OrderDetailData.id);
     const totalPrice =
       OrderDetailData.price_per_unit * OrderDetailData.quantity;
     const vatAmount = totalPrice * (OrderDetailData.vat / 100);
@@ -66,15 +88,7 @@ module.exports = {
     const cost = totalPrice + vatAmount;
 
     const totalAfterDiscount = cost - cost * (OrderDetailData.discount / 100);
-    const holderUpdatedBy = await prisma.users.findUnique({
-      where: {
-        id: OrderDetailData.updated_by,
-      },
-    });
 
-    if (!holderUpdatedBy) {
-      throw new NotFoundError("Ko tìm thấy sửa bởi User nào");
-    }
     const updateOrderDetail = await prisma.orders_detail.update({
       where: {
         id: OrderDetailData.id,
@@ -94,8 +108,7 @@ module.exports = {
         status: OrderDetailData.status,
       },
     });
-    if (!updateOrderDetail)
-      throw new NotFoundError("Ko tìm thấy ID OrderDetail cần sửa");
+
     return updateOrderDetail;
   },
   //   deleteProductService: async (OrderDetailData) => {

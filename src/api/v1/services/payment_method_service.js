@@ -5,6 +5,11 @@ const {
   ConflictRequestError,
   NotFoundError,
 } = require("../../core/error.response");
+const {
+  validateCreatedBy,
+  validatedUpdatedBy,
+  validateRefPaymentMethod,
+} = require("../../middleware/validateReferencer");
 module.exports = {
   getPaymentMethodService: async (queryParams) => {
     const { id, page, limit } = queryParams;
@@ -36,6 +41,8 @@ module.exports = {
     return PaymentMethod;
   },
   createPaymentMethodsService: async (PaymentMethod) => {
+    //check createdby
+    await validateCreatedBy(PaymentMethod.created_by);
     const newPaymentMethod = await prisma.payment_method.create({
       data: {
         name: PaymentMethod.name,
@@ -47,15 +54,11 @@ module.exports = {
     return newPaymentMethod;
   },
   putPaymentMethodService: async (PaymentMethodData) => {
-    const holderUpdatedBy = await prisma.users.findUnique({
-      where: {
-        id: PaymentMethodData.updated_by,
-      },
-    });
-
-    if (!holderUpdatedBy) {
-      throw new NotFoundError("Ko tìm thấy sửa bởi User nào");
-    }
+    //check Updated isExist
+    await validatedUpdatedBy(PaymentMethodData.updated_by);
+    //check paymentmethod isexist
+    await validateRefPaymentMethod(PaymentMethodData.id);
+    //
     const updatePaymentMethod = await prisma.payment_method.update({
       where: {
         id: PaymentMethodData.id,
@@ -67,8 +70,6 @@ module.exports = {
         status: PaymentMethodData.status,
       },
     });
-    if (!updatePaymentMethod)
-      throw new NotFoundError("Ko tìm thấy ID PaymentMethod cần sửa");
     return updatePaymentMethod;
   },
   //   deleteProductService: async (PaymentMethodData) => {

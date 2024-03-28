@@ -5,6 +5,13 @@ const {
   ConflictRequestError,
   NotFoundError,
 } = require("../../core/error.response");
+const {
+  validateCreatedBy,
+  validateRefProduct,
+  validateRefCatalogue,
+  validatedUpdatedBy,
+  validateRefMenuProduct,
+} = require("../../middleware/validateReferencer");
 module.exports = {
   getMenuProductsService: async (queryParams) => {
     const { id, page, limit } = queryParams;
@@ -33,22 +40,13 @@ module.exports = {
     return menuProducts;
   },
   createMenuProductsService: async (MenuProduct) => {
-    const holderMenuProduct = await prisma.products.findUnique({
-      where: {
-        id: MenuProduct.product_id,
-      },
-    });
-    if (!holderMenuProduct) {
-      throw new NotFoundError("Error: ProductID does not exist!");
-    }
-    const holderCatalogue = await prisma.catalogue.findUnique({
-      where: {
-        id: MenuProduct.catalogue_id,
-      },
-    });
-    if (!holderCatalogue) {
-      throw new NotFoundError("Error: CatalogueJD does not exist!");
-    }
+    //Check User Created By phải tồn tại
+    await validateCreatedBy(MenuProduct.created_by);
+    //Check Product tham chiếu trong bảng product có tồn tại k
+    await validateRefProduct(MenuProduct.product_id);
+    //
+    await validateRefCatalogue(MenuProduct.catalogue_id);
+    //Truy vấn
     const newProduct = await prisma.menu_products.create({
       data: {
         name: MenuProduct.name,
@@ -60,27 +58,43 @@ module.exports = {
     });
     return newProduct;
   },
-  putMenuProductService: async (ProductData) => {
-    const updatedProduct = await prisma.menu_products.update({
+  putMenuProductService: async (MenuProductData) => {
+    //check Menu Product cần sửa có tồn tại k
+    await validateRefMenuProduct(MenuProductData.id);
+    //check id cần sửa của menu product có tồn tại k
+    await validatedUpdatedBy(MenuProductData.updated_by);
+    //Check Product tham chiếu trong bảng product có tồn tại k
+    await validateRefProduct(MenuProductData.product_id);
+    //Check Catalogue
+    await validateRefCatalogue(MenuProductData.catalogue_id);
+    //
+    const holderCatalogue = await prisma.catalogue.findUnique({
       where: {
-        id: ProductData.id,
-      },
-      data: {
-        name: ProductData.name,
-        product_id: ProductData.product_id,
-        catalogue_id: ProductData.catalogue_id,
-        updated_by: ProductData.updated_by,
-        status: ProductData.status,
+        id: MenuProductData.catalogue_id,
       },
     });
-    if (!updatedProduct)
-      throw new NotFoundError("Ko tìm thấy ID Sản Phẩm cần sửa");
+    if (!holderCatalogue) {
+      throw new NotFoundError("Error: CatalogueJD does not exist!");
+    }
+    //
+    const updatedProduct = await prisma.menu_products.update({
+      where: {
+        id: MenuProductData.id,
+      },
+      data: {
+        name: MenuProductData.name,
+        product_id: MenuProductData.product_id,
+        catalogue_id: MenuProductData.catalogue_id,
+        updated_by: MenuProductData.updated_by,
+        status: MenuProductData.status,
+      },
+    });
     return updatedProduct;
   },
-  deleteMenuProductService: async (ProductData) => {
+  deleteMenuProductService: async (MenuProductData) => {
     const deleteProduct = await prisma.products.delete({
       where: {
-        id: ProductData.id,
+        id: MenuProductData.id,
       },
     });
     return deleteProduct;

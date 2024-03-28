@@ -5,6 +5,11 @@ const {
   ConflictRequestError,
   NotFoundError,
 } = require("../../core/error.response");
+const {
+  validateCreatedBy,
+  validatedUpdatedBy,
+  validateRefCatalogue,
+} = require("../../middleware/validateReferencer");
 module.exports = {
   getCatalogueService: async (queryParams) => {
     const { id, page, limit } = queryParams;
@@ -36,8 +41,9 @@ module.exports = {
     return Catalogue;
   },
   createCataloguesService: async (Catalogue) => {
-    //check coi Catalogue này được tạo bởi user nào
-
+    //check CreatedBy isExist
+    await validateCreatedBy(Catalogue.created_by);
+    //
     const newCatalogue = await prisma.catalogue.create({
       data: {
         description: Catalogue.description,
@@ -49,15 +55,11 @@ module.exports = {
     return newCatalogue;
   },
   putCatalogueService: async (CatalogueData) => {
-    const holderUpdatedBy = await prisma.users.findUnique({
-      where: {
-        id: CatalogueData.updated_by,
-      },
-    });
-
-    if (!holderUpdatedBy) {
-      throw new NotFoundError("Ko tìm thấy sửa bởi User nào");
-    }
+    //check UpdateBy isExist
+    await validatedUpdatedBy(CatalogueData.created_by);
+    //check CatalogueId isExist
+    await validateRefCatalogue(CatalogueData.id);
+    //
     const updateCatalogue = await prisma.catalogue.update({
       where: {
         id: CatalogueData.id,
@@ -70,8 +72,6 @@ module.exports = {
         status: CatalogueData.status,
       },
     });
-    if (!updateCatalogue)
-      throw new NotFoundError("Ko tìm thấy ID Catalogue cần sửa");
     return updateCatalogue;
   },
   //   deleteProductService: async (CatalogueData) => {

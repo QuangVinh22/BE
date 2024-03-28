@@ -20,6 +20,7 @@ const OrderDetailRoutes = require("./api/v1/routes/order_details_routes");
 const QRRoutes = require("./api/v1/routes/qr_route");
 const QRRoleRoutes = require("./api/v1/routes/qr_role_route");
 const PaymentMethodRoutes = require("./api/v1/routes/payment_method_route");
+const UserRoutes = require("./api/v1/routes/user_route");
 const app = express();
 PaymentMethodRoutes;
 //init middleware
@@ -46,6 +47,8 @@ app.use("/v1/order_detail", OrderDetailRoutes);
 app.use("/v1/qr_role", QRRoleRoutes);
 app.use("/v1/payment_method", PaymentMethodRoutes);
 app.use("/v1/qr", QRRoutes);
+app.use("/v1/user", UserRoutes);
+
 //Redis
 const client = require("./helpers/connect_redis");
 //

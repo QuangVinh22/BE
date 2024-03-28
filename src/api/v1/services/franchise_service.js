@@ -5,6 +5,12 @@ const {
   ConflictRequestError,
   NotFoundError,
 } = require("../../core/error.response");
+const {
+  validateCreatedBy,
+  validateRefFloor,
+  validateRefFranchise,
+  validatedUpdatedBy,
+} = require("../../middleware/validateReferencer");
 module.exports = {
   getFranchiseService: async (queryParams) => {
     const { id, page, limit } = queryParams;
@@ -16,7 +22,7 @@ module.exports = {
         where: { id: parseInt(id), status: true },
       });
       if (!holderFranchise)
-        throw new BadRequestError("Id Franchise  không tồn tại");
+        throw new NotFoundError("Id Franchise  không tồn tại");
       return [holderFranchise]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
     }
 
@@ -37,8 +43,13 @@ module.exports = {
   },
   createFranchisesService: async (Franchise) => {
     //check coi Franchise này được tạo bởi user nào
+    await validateCreatedBy(Franchise.created_by);
+    //Check quản lý của chi nhánh này
+    await validateCreatedBy(Franchise.user_id);
+    //check floor Tham chieu co dung k
+    await validateRefFloor(Franchise.floor_id);
+    //
 
-    console.log(Franchise);
     const newFranchise = await prisma.franchise.create({
       data: {
         user_id: Franchise.user_id,
@@ -53,15 +64,22 @@ module.exports = {
     return newFranchise;
   },
   putFranchiseService: async (FranchiseData) => {
-    const holderUpdatedBy = await prisma.users.findUnique({
+    //check FranchiseId isExist
+    await validateRefFranchise(FranchiseData.id);
+
+    //Check quản lý của chi nhánh này
+    const holderUserId = await prisma.users.findUnique({
       where: {
-        id: FranchiseData.updated_by,
+        id: FranchiseData.user_id,
       },
     });
 
-    if (!holderUpdatedBy) {
-      throw new NotFoundError("Ko tìm thấy sửa bởi User nào");
+    if (!holderUserId) {
+      throw new NotFoundError("Ko tìm thấy Id quản lý của chi nhánh cần sửa ");
     }
+    //check cap nhat boi ai
+    await validatedUpdatedBy(FranchiseData.updated_by);
+    //Update
     const updateFranchise = await prisma.franchise.update({
       where: {
         id: FranchiseData.id,
@@ -76,8 +94,6 @@ module.exports = {
         status: FranchiseData.status,
       },
     });
-    if (!updateFranchise)
-      throw new NotFoundError("Ko tìm thấy ID Franchise cần sửa");
     return updateFranchise;
   },
   //   deleteProductService: async (FranchiseData) => {

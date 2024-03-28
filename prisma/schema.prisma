@@ -8,17 +8,19 @@ datasource db {
 }
 
 model users {
+  id                                                           Int                @id @default(autoincrement())
+  franchies_id                                                 Int?
+  role_id                                                      Int?
+  username                                                     String             @db.VarChar
+  email                                                        String             @unique
+  password                                                     String
   created_by                                                   Int?
   created_time                                                 DateTime?          @default(now())
-  email                                                        String             @unique
-  franchies_id                                                 Int?
-  id                                                           Int                @id @default(autoincrement())
-  password                                                     String
-  role_id                                                      Int?
-  status                                                       Boolean?
   updated_by                                                   Int?
   updated_time                                                 DateTime? @db.Timestamp(6) @updatedAt
-  username                                                     String             @db.VarChar
+  status                                                       Boolean?
+
+
   catalogue_catalogue_created_byTousers                        catalogue[]        @relation("catalogue_created_byTousers")
   catalogue_catalogue_updated_byTousers                        catalogue[]        @relation("catalogue_updated_byTousers")
   floors_floors_created_byTousers                              floors[]           @relation("floors_created_byTousers")

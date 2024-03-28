@@ -3,7 +3,14 @@ const prisma = new PrismaClient();
 const {
   BadRequestError,
   ConflictRequestError,
+  NotFoundError,
 } = require("../../core/error.response");
+const {
+  validateCreatedBy,
+  validateRefFloor,
+  validatedUpdatedBy,
+  validateRefTable,
+} = require("../../middleware/validateReferencer");
 module.exports = {
   getTableService: async (queryParams) => {
     const { id, page, limit } = queryParams;
@@ -14,7 +21,7 @@ module.exports = {
       const holderTable = await prisma.tables.findUnique({
         where: { id: parseInt(id), status: true },
       });
-      if (!holderTable) throw new BadRequestError("Id Table  không tồn tại");
+      if (!holderTable) throw new NotFoundError("Id Table  không tồn tại");
       return [holderTable]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
     }
 
@@ -34,6 +41,12 @@ module.exports = {
     return table;
   },
   createTablesService: async (table) => {
+    //check tạo bởi ai
+    await validateCreatedBy(table.created_by);
+
+    //check Floor tham chiếu
+    await validateRefFloor(table.floor_id);
+
     const newTable = await prisma.tables.create({
       data: {
         floor_id: table.floor_id,
@@ -45,14 +58,15 @@ module.exports = {
     return newTable;
   },
   putTableService: async (TableData) => {
-    const holderUpdatedBy = await prisma.users.findUnique({
-      where: {
-        id: TableData.updated_by,
-      },
-    });
-    if (!holderUpdatedBy) {
-      throw new BadRequestError("Ko tìm thấy sửa bởi User nào");
-    }
+    await validatedUpdatedBy(TableData.updated_by);
+    //
+    await validateRefFloor(TableData.floor_id);
+
+    //check coi Sửa đúng ID ko
+
+    //check tableID isExist
+    await validateRefTable(TableData.id);
+    //
     const updateTable = await prisma.tables.update({
       where: {
         id: TableData.id,
@@ -65,7 +79,6 @@ module.exports = {
         status: TableData.status,
       },
     });
-    if (!updateTable) throw new BadRequestError("Ko tìm thấy ID Table cần sửa");
     return updateTable;
   },
   //   deleteProductService: async (TableData) => {

@@ -5,6 +5,13 @@ const {
   ConflictRequestError,
   NotFoundError,
 } = require("../../core/error.response");
+const {
+  validateRefFranchise,
+  validateRefRole,
+  validateCreatedBy,
+  validatedUpdatedBy,
+  validateRefQRRole,
+} = require("../../middleware/validateReferencer");
 module.exports = {
   getQRRoleService: async (queryParams) => {
     const { id, page, limit } = queryParams;
@@ -35,6 +42,12 @@ module.exports = {
     return QRRole;
   },
   createQRRolesService: async (QRRole) => {
+    //check franchise
+    await validateRefFranchise(QRRole.franchise_id);
+    //check Role
+    await validateRefRole(QRRole.role_id);
+    //check createdby
+    await validateCreatedBy(QRRole.created_by);
     const newQRRole = await prisma.qr_role.create({
       data: {
         franchise_id: QRRole.franchise_id,
@@ -50,15 +63,14 @@ module.exports = {
     const vatAmount = QRRoleData.price * (QRRoleData.vat / 100);
     const cost = QRRoleData.price + vatAmount;
     const totalAfterDiscount = cost - cost * (QRRoleData.discount / 100);
-    const holderUpdatedBy = await prisma.users.findUnique({
-      where: {
-        id: QRRoleData.updated_by,
-      },
-    });
-
-    if (!holderUpdatedBy) {
-      throw new NotFoundError("Ko tìm thấy sửa bởi User nào");
-    }
+    //updatedby
+    await validatedUpdatedBy(QRRoleData.updated_by);
+    //franchise
+    await validateRefFranchise(QRRoleData.franchise_id);
+    //roleID
+    await validateRefRole(QRRoleData.role_id);
+    //
+    await validateRefQRRole(QRRoleData.id);
     const updateQRRole = await prisma.qr_role.update({
       where: {
         id: QRRoleData.id,
@@ -71,7 +83,6 @@ module.exports = {
         status: QRRoleData.status,
       },
     });
-    if (!updateQRRole) throw new NotFoundError("Ko tìm thấy ID QRRole cần sửa");
     return updateQRRole;
   },
   //   deleteProductService: async (QRRoleData) => {

@@ -1,5 +1,14 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const {
+  BadRequestError,
+  NotFoundError,
+  ConflictRequestError,
+} = require("../../core/error.response");
+const {
+  validatedUpdatedBy,
+  validateRefRole,
+} = require("../../middleware/validateReferencer");
 module.exports = {
   getRoleService: async (queryParams) => {
     const { id, page, limit } = queryParams;
@@ -10,7 +19,7 @@ module.exports = {
       const holderRole = await prisma.role.findUnique({
         where: { id: parseInt(id), status: true },
       });
-      if (!holderRole) throw new BadRequestError("Id Role  không tồn tại");
+      if (!holderRole) throw new NotFoundError("Id Role  không tồn tại");
       return [holderRole]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
     }
 
@@ -31,14 +40,7 @@ module.exports = {
   },
   createRolesService: async (Role) => {
     //check coi Role này được tạo bởi user nào
-    const holderCreatedBy = await prisma.users.findUnique({
-      where: {
-        id: Role.created_by,
-      },
-    });
-    if (!holderCreatedBy) {
-      throw new NotFoundError("Ko tìm thấy tạo bởi User nào");
-    }
+    await validateCreatedBy(Role.created_by);
     const newRole = await prisma.role.create({
       data: {
         name: Role.name,
@@ -50,15 +52,10 @@ module.exports = {
     return newRole;
   },
   putRoleService: async (RoleData) => {
-    const holderUpdatedBy = await prisma.users.findUnique({
-      where: {
-        id: RoleData.updated_by,
-      },
-    });
-
-    if (!holderUpdatedBy) {
-      throw new NotFoundError("Ko tìm thấy sửa bởi User nào");
-    }
+    //check user update có tồn tài k mới cho sửa
+    await validatedUpdatedBy(RoleData.updated_by);
+    //check Idrole isexist
+    await validateRefRole(RoleData.id);
     const updateRole = await prisma.role.update({
       where: {
         id: RoleData.id,
@@ -71,7 +68,6 @@ module.exports = {
         status: RoleData.status,
       },
     });
-    if (!updateRole) throw new NotFoundError("Ko tìm thấy ID Role cần sửa");
     return updateRole;
   },
 };

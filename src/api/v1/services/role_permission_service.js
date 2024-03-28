@@ -1,4 +1,10 @@
 const { PrismaClient } = require("@prisma/client");
+const {
+  validateCreatedBy,
+  validateRefRole,
+  validatedUpdatedBy,
+  validateRefRolePermission,
+} = require("../../middleware/validateReferencer");
 const prisma = new PrismaClient();
 module.exports = {
   getRolePermissionService: async (queryParams) => {
@@ -32,14 +38,9 @@ module.exports = {
   },
   createRolePermissionsService: async (RolePermission) => {
     //check coi RolePermission này được tạo bởi user nào
-    const holderCreatedBy = await prisma.users.findUnique({
-      where: {
-        id: RolePermission.created_by,
-      },
-    });
-    if (!holderCreatedBy) {
-      throw new NotFoundError("Ko tìm thấy tạo bởi User nào");
-    }
+    await validateCreatedBy(RolePermission.created_by);
+    //Check Role isvalidate
+    await validateRefRole(RolePermission.role_id);
     const newRolePermission = await prisma.role_permissions.create({
       data: {
         role_id: RolePermission.role_id,
@@ -51,15 +52,13 @@ module.exports = {
     return newRolePermission;
   },
   putRolePermissionService: async (RolePermissionData) => {
-    const holderUpdatedBy = await prisma.users.findUnique({
-      where: {
-        id: RolePermissionData.updated_by,
-      },
-    });
+    //Check RolePermission isexist
+    await validateRefRolePermission(RolePermissionData.id);
+    //
+    await validatedUpdatedBy(RolePermissionData.updated_by);
 
-    if (!holderUpdatedBy) {
-      throw new NotFoundError("Ko tìm thấy sửa bởi User nào");
-    }
+    await validateRefRole(RolePermissionData.role_id);
+
     const updateRolePermission = await prisma.role_permissions.update({
       where: {
         id: RolePermissionData.id,
@@ -71,8 +70,6 @@ module.exports = {
         status: RolePermissionData.status,
       },
     });
-    if (!updateRolePermission)
-      throw new NotFoundError("Ko tìm thấy ID RolePermission cần sửa");
     return updateRolePermission;
   },
 };

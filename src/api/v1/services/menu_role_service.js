@@ -1,4 +1,10 @@
 const { PrismaClient } = require("@prisma/client");
+const {
+  validateCreatedBy,
+  validateRefRolePermission,
+  validatedUpdatedBy,
+  validateRefMenuRole,
+} = require("../../middleware/validateReferencer");
 const prisma = new PrismaClient();
 module.exports = {
   getMenuRoleService: async (queryParams) => {
@@ -31,15 +37,10 @@ module.exports = {
     return MenuRole;
   },
   createMenuRolesService: async (MenuRole) => {
-    //check coi MenuRole này được tạo bởi user nào
-    const holderCreatedBy = await prisma.users.findUnique({
-      where: {
-        id: MenuRole.created_by,
-      },
-    });
-    if (!holderCreatedBy) {
-      throw new NotFoundError("Ko tìm thấy tạo bởi User nào");
-    }
+    //check coi MenuRole này được tạo bởi user có tồn tại k
+    await validateCreatedBy(MenuRole.created_by);
+    //Check Role Permission tham chiếu tới có tồn tại k
+    await validateRefRolePermission(MenuRole.role_permissions_id);
     const newMenuRole = await prisma.menu_role.create({
       data: {
         role_permissions_id: MenuRole.role_permissions_id,
@@ -52,15 +53,12 @@ module.exports = {
     return newMenuRole;
   },
   putMenuRoleService: async (MenuRoleData) => {
-    const holderUpdatedBy = await prisma.users.findUnique({
-      where: {
-        id: MenuRoleData.updated_by,
-      },
-    });
-
-    if (!holderUpdatedBy) {
-      throw new NotFoundError("Ko tìm thấy sửa bởi User nào");
-    }
+    //Check coi bảng này được Update bởi user có tồn tại k
+    await validatedUpdatedBy(MenuRoleData.updated_by);
+    //Check Role Permission tham chiếu tới có tồn tại k
+    await validateRefRolePermission(MenuRoleData.role_permissions_id);
+    //Check MenuRole cần sửa có tồn tại hay k
+    await validateRefMenuRole(MenuRoleData.id);
     const updateMenuRole = await prisma.menu_role.update({
       where: {
         id: MenuRoleData.id,
@@ -73,8 +71,6 @@ module.exports = {
         status: MenuRoleData.status,
       },
     });
-    if (!updateMenuRole)
-      throw new NotFoundError("Ko tìm thấy ID MenuRole cần sửa");
     return updateMenuRole;
   },
 };
