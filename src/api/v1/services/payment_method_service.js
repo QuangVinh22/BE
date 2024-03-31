@@ -9,7 +9,7 @@ const {
   validateCreatedBy,
   validatedUpdatedBy,
   validateRefPaymentMethod,
-} = require("../../middleware/validateReferencer");
+} = require("../../middleware/validate/validateReferencer");
 module.exports = {
   getPaymentMethodService: async (queryParams) => {
     const { id, page, limit } = queryParams;

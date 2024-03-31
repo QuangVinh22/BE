@@ -8,7 +8,7 @@ const asyncHandler = require("../../middleware/handleError");
 const {
   validateUserRegistration,
   validateUserLogin,
-} = require("../../middleware/validateAuth");
+} = require("../../middleware/validate/validateAuth");
 
 AuthRoutes.post("/register", asyncHandler(AuthRegisterController));
 AuthRoutes.post("/login", validateUserLogin, asyncHandler(AuthLoginController));

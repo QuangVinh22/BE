@@ -13,7 +13,7 @@ const {
   validateRefPaymentMethod,
   validatedUpdatedBy,
   validateCreatedBy,
-} = require("../../middleware/validateReferencer");
+} = require("../../middleware/validate/validateReferencer");
 module.exports = {
   getOrderService: async (queryParams) => {
     const { id, page, limit } = queryParams;

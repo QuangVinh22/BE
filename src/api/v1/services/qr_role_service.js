@@ -11,7 +11,7 @@ const {
   validateCreatedBy,
   validatedUpdatedBy,
   validateRefQRRole,
-} = require("../../middleware/validateReferencer");
+} = require("../../middleware/validate/validateReferencer");
 module.exports = {
   getQRRoleService: async (queryParams) => {
     const { id, page, limit } = queryParams;

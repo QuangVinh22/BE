@@ -4,7 +4,7 @@ const {
   validateRefRolePermission,
   validatedUpdatedBy,
   validateRefMenuRole,
-} = require("../../middleware/validateReferencer");
+} = require("../../middleware/validate/validateReferencer");
 const prisma = new PrismaClient();
 module.exports = {
   getMenuRoleService: async (queryParams) => {

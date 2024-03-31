@@ -10,10 +10,14 @@ const {
 // const { validateCatalogue } = require("../../middleware/validateCatalogue");
 //
 const { verifyAccessToken } = require("../services/jwt_service");
-
+const {
+  validateCataloguePost,
+  validateCataloguePut,
+} = require("../../middleware/validate/validateCatalogue");
 CatalogueRoutes.post(
   "/post",
   verifyAccessToken,
+  validateCataloguePost,
   asyncHandler(postCatalogueController)
 );
 CatalogueRoutes.get(
@@ -24,6 +28,7 @@ CatalogueRoutes.get(
 CatalogueRoutes.put(
   "/put",
   verifyAccessToken,
+  validateCataloguePut,
   asyncHandler(putCatalogueController)
 );
 // CatalogueRoutes.delete(

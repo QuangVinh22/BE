@@ -7,13 +7,26 @@ const {
   getTableController,
   putTableController,
 } = require("../controllers/table_controller");
-// const { validateTable } = require("../../middleware/validateTable");
-//
+const {
+  validateTablesPost,
+  validateTablesPut,
+} = require("../../middleware/validate/validateTable");
+
 const { verifyAccessToken } = require("../services/jwt_service");
 
-TableRoutes.post("/post", verifyAccessToken, asyncHandler(postTableController));
+TableRoutes.post(
+  "/post",
+  verifyAccessToken,
+  validateTablesPost,
+  asyncHandler(postTableController)
+);
 TableRoutes.get("/get", verifyAccessToken, asyncHandler(getTableController));
-TableRoutes.put("/put", verifyAccessToken, asyncHandler(putTableController));
+TableRoutes.put(
+  "/put",
+  verifyAccessToken,
+  validateTablesPut,
+  asyncHandler(putTableController)
+);
 // TableRoutes.delete(
 //   "/delete",
 //   verifyAccessToken,

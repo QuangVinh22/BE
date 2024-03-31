@@ -11,7 +11,7 @@ const {
   validateRefCatalogue,
   validatedUpdatedBy,
   validateRefMenuProduct,
-} = require("../../middleware/validateReferencer");
+} = require("../../middleware/validate/validateReferencer");
 module.exports = {
   getMenuProductsService: async (queryParams) => {
     const { id, page, limit } = queryParams;

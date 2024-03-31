@@ -7,17 +7,26 @@ const {
   getQRRoleController,
   putQRRoleController,
 } = require("../controllers/qr_role_controller");
-// const { validateQRRole } = require("../../middleware/validateQRRole");
-//
+const {
+  validateQRRolePost,
+  validateQRRolePut,
+} = require("../../middleware/validate/validateQR_role");
+
 const { verifyAccessToken } = require("../services/jwt_service");
 
 QRRoleRoutes.post(
   "/post",
   verifyAccessToken,
+  validateQRRolePost,
   asyncHandler(postQRRoleController)
 );
 QRRoleRoutes.get("/get", verifyAccessToken, asyncHandler(getQRRoleController));
-QRRoleRoutes.put("/put", verifyAccessToken, asyncHandler(putQRRoleController));
+QRRoleRoutes.put(
+  "/put",
+  verifyAccessToken,
+  validateQRRolePut,
+  asyncHandler(putQRRoleController)
+);
 // QRRoleRoutes.delete(
 //   "/delete",
 //   verifyAccessToken,

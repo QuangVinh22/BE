@@ -1,0 +1,63 @@
+const { BadRequestError } = require("../../core/error.response"); // Giả sử đây là đường dẫn đến file của bạn
+const Joi = require("joi");
+
+const validatePaymentMethodPost = (req, res, next) => {
+  const postSchema = Joi.object({
+    name: Joi.string().required().messages({
+      "string.base": `"Name" must be a string.`,
+      "any.required": `"Name" is a required field.`,
+    }),
+    description: Joi.string().allow("").optional().messages({
+      "string.base": `"Description" must be a string.`,
+    }),
+    created_by: Joi.number().integer().required().messages({
+      "number.base": `"Created By" must be a number.`,
+      "number.integer": `"Created By" must be an integer.`,
+      "any.required": `"Created By" is a required field.`,
+    }),
+    status: Joi.boolean().required().messages({
+      "boolean.base": `"Status" must be true or false.`,
+      "any.required": `"Status" is a required field.`,
+    }),
+  });
+
+  const { error } = postSchema.validate(req.body);
+  if (error) {
+    throw new BadRequestError(error.details[0].message);
+  }
+  next();
+};
+const validatePaymentMethodPut = (req, res, next) => {
+  const putSchema = Joi.object({
+    id: Joi.number().integer().required().messages({
+      "number.base": `"ID" must be a number.`,
+      "number.integer": `"ID" must be an integer.`,
+      "any.required": `"ID" is a required field.`,
+    }),
+    name: Joi.string().optional().messages({
+      "string.base": `"Name" must be a string.`,
+    }),
+    description: Joi.string().allow("").optional().messages({
+      "string.base": `"Description" must be a string.`,
+    }),
+    updated_by: Joi.number().integer().required().messages({
+      "number.base": `"Updated By" must be a number.`,
+      "number.integer": `"Updated By" must be an integer.`,
+      "any.required": `"Updated By" is a required field.`,
+    }),
+    status: Joi.boolean().required().messages({
+      "boolean.base": `"Status" must be true or false.`,
+      "any.required": `"Status" is a required field.`,
+    }),
+  });
+
+  const { error } = putSchema.validate(req.body);
+  if (error) {
+    throw new BadRequestError(error.details[0].message);
+  }
+  next();
+};
+module.exports = {
+  validatePaymentMethodPost,
+  validatePaymentMethodPut,
+};

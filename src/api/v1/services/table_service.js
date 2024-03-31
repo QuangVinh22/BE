@@ -10,7 +10,7 @@ const {
   validateRefFloor,
   validatedUpdatedBy,
   validateRefTable,
-} = require("../../middleware/validateReferencer");
+} = require("../../middleware/validate/validateReferencer");
 module.exports = {
   getTableService: async (queryParams) => {
     const { id, page, limit } = queryParams;

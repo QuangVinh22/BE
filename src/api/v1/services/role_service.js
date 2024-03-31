@@ -8,7 +8,7 @@ const {
 const {
   validatedUpdatedBy,
   validateRefRole,
-} = require("../../middleware/validateReferencer");
+} = require("../../middleware/validate/validateReferencer");
 module.exports = {
   getRoleService: async (queryParams) => {
     const { id, page, limit } = queryParams;

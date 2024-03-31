@@ -7,9 +7,15 @@ const {
   putMenuProductController,
 } = require("../controllers/menu_product_controller");
 const { verifyAccessToken } = require("../services/jwt_service");
+const {
+  validateMenuProductPost,
+  validateMenuProductPut,
+} = require("../../middleware/validate/validateMenuProduct");
+
 MenuProductRoutes.post(
   "/post",
   verifyAccessToken,
+  validateMenuProductPost,
   asyncHandler(postMenuProductController)
 );
 MenuProductRoutes.get(
@@ -20,6 +26,7 @@ MenuProductRoutes.get(
 MenuProductRoutes.put(
   "/put",
   verifyAccessToken,
+  validateMenuProductPut,
   asyncHandler(putMenuProductController)
 );
 // ProductRoutes.delete(

@@ -1,5 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
-const { NotFoundError } = require("../core/error.response");
+const { NotFoundError } = require("../../core/error.response");
 
 const prisma = new PrismaClient();
 module.exports = {
@@ -47,10 +47,10 @@ module.exports = {
     }
   },
   validateRefCatalogue: async (id) => {
-    const isExistFloor = await prisma.catalogue.findUnique({
+    const isExistCatalogue = await prisma.catalogue.findUnique({
       where: { id: id, status: true },
     });
-    if (!isExistFloor) {
+    if (!isExistCatalogue) {
       throw new NotFoundError("Id Catalogue không tồn tại ");
     }
   },

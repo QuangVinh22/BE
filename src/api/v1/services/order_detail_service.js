@@ -11,7 +11,7 @@ const {
   validateCreatedBy,
   validatedUpdatedBy,
   validateRefOrderDetails,
-} = require("../../middleware/validateReferencer");
+} = require("../../middleware/validate/validateReferencer");
 module.exports = {
   getOrderDetailService: async (queryParams) => {
     const { id, page, limit } = queryParams;
@@ -50,9 +50,10 @@ module.exports = {
     //validate User Createdby isExist
     await validateCreatedBy(OrderDetail.created_by);
     //
-    const vatAmount = OrderDetail.price * (OrderDetail.vat / 100);
+
     const totalPrice = OrderDetail.price_per_unit * OrderDetail.quantity;
-    const cost = OrderDetail.price + vatAmount;
+    const vatAmount = totalPrice * (OrderDetail.vat / 100);
+    const cost = totalPrice + vatAmount;
     const totalAfterDiscount = cost - cost * (OrderDetail.discount / 100);
     const newOrderDetail = await prisma.orders_detail.create({
       data: {

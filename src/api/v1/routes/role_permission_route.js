@@ -7,13 +7,17 @@ const {
   getRolePermissionController,
   putRolePermissionController,
 } = require("../controllers/role_permission_controller");
-// const { validateRolePermission } = require("../../middleware/validateRolePermission");
+const {
+  validateRolePermissionsPost,
+  validateRolePermissionsPut,
+} = require("../../middleware/validate/validateRole_Permission");
 //
 const { verifyAccessToken } = require("../services/jwt_service");
 
 RolePermissionRoutes.post(
   "/post",
   verifyAccessToken,
+  validateRolePermissionsPost,
   asyncHandler(postRolePermissionController)
 );
 RolePermissionRoutes.get(
@@ -24,6 +28,7 @@ RolePermissionRoutes.get(
 RolePermissionRoutes.put(
   "/put",
   verifyAccessToken,
+  validateRolePermissionsPut,
   asyncHandler(putRolePermissionController)
 );
 // RolePermissionRoutes.delete(

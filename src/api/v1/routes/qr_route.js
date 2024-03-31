@@ -7,13 +7,26 @@ const {
   getQRController,
   putQRController,
 } = require("../controllers/qr_controller");
-// const { validateQR } = require("../../middleware/validateQR");
-//
+const {
+  validateQRPost,
+  validateQRPut,
+} = require("../../middleware/validate/validateQR");
+
 const { verifyAccessToken } = require("../services/jwt_service");
 
-QRRoutes.post("/post", verifyAccessToken, asyncHandler(postQRController));
+QRRoutes.post(
+  "/post",
+  verifyAccessToken,
+  validateQRPost,
+  asyncHandler(postQRController)
+);
 QRRoutes.get("/get", verifyAccessToken, asyncHandler(getQRController));
-QRRoutes.put("/put", verifyAccessToken, asyncHandler(putQRController));
+QRRoutes.put(
+  "/put",
+  verifyAccessToken,
+  validateQRPut,
+  asyncHandler(putQRController)
+);
 // QRRoutes.delete(
 //   "/delete",
 //   verifyAccessToken,

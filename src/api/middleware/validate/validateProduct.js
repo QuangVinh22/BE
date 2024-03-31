@@ -1,4 +1,4 @@
-const { BadRequestError } = require("../core/error.response"); // Giả sử đây là đường dẫn đến file của bạn
+const { BadRequestError } = require("../../core/error.response"); // Giả sử đây là đường dẫn đến file của bạn
 const Joi = require("joi");
 
 const productValidationSchema = Joi.object({

@@ -9,7 +9,7 @@ const {
   validatedUpdatedBy,
   validateRefProduct,
   validateCreatedBy,
-} = require("../../middleware/validateReferencer");
+} = require("../../middleware/validate/validateReferencer");
 module.exports = {
   getProductsService: async (queryParams) => {
     const { id, page, limit } = queryParams;

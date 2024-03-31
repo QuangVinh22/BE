@@ -7,23 +7,24 @@ const {
   getOrderController,
   putOrderController,
 } = require("../controllers/order_controller");
-// const { validateOrder } = require("../../middleware/validateOrder");
-//
+const {
+  validateOrdersPost,
+  validateOrdersPut,
+} = require("../../middleware/validate/validateOrder");
+
 const { verifyAccessToken } = require("../services/jwt_service");
 
 OrderRoutes.post(
   "/post",
   verifyAccessToken,
+  validateOrdersPost,
   asyncHandler(postOrderController)
 );
-OrderRoutes.get(
-  "/get",
-  verifyAccessToken,
-  asyncHandler(getOrderController)
-);
+OrderRoutes.get("/get", verifyAccessToken, asyncHandler(getOrderController));
 OrderRoutes.put(
   "/put",
   verifyAccessToken,
+  validateOrdersPut,
   asyncHandler(putOrderController)
 );
 // OrderRoutes.delete(

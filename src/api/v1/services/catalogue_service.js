@@ -9,7 +9,7 @@ const {
   validateCreatedBy,
   validatedUpdatedBy,
   validateRefCatalogue,
-} = require("../../middleware/validateReferencer");
+} = require("../../middleware/validate/validateReferencer");
 module.exports = {
   getCatalogueService: async (queryParams) => {
     const { id, page, limit } = queryParams;
@@ -56,7 +56,7 @@ module.exports = {
   },
   putCatalogueService: async (CatalogueData) => {
     //check UpdateBy isExist
-    await validatedUpdatedBy(CatalogueData.created_by);
+    await validatedUpdatedBy(CatalogueData.updated_by);
     //check CatalogueId isExist
     await validateRefCatalogue(CatalogueData.id);
     //

@@ -7,7 +7,9 @@ const {
   putProductController,
   deleteProductController,
 } = require("../controllers/product_controller");
-const { validateProduct } = require("../../middleware/validateProduct");
+const {
+  validateProduct,
+} = require("../../middleware/validate/validateProduct");
 
 const { verifyAccessToken } = require("../services/jwt_service");
 ProductRoutes.post(

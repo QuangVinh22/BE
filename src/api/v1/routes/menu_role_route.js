@@ -7,13 +7,17 @@ const {
   getMenuRoleController,
   putMenuRoleController,
 } = require("../controllers/menu_role_controller");
-// const { validateMenuRole } = require("../../middleware/validateMenuRole");
+const {
+  validateMenuRolePost,
+  validateMenuRolePut,
+} = require("../../middleware/validate/validateMenu_Role");
 //
 const { verifyAccessToken } = require("../services/jwt_service");
 
 MenuRoleRoutes.post(
   "/post",
   verifyAccessToken,
+  validateMenuRolePost,
   asyncHandler(postMenuRoleController)
 );
 MenuRoleRoutes.get(
@@ -24,6 +28,7 @@ MenuRoleRoutes.get(
 MenuRoleRoutes.put(
   "/put",
   verifyAccessToken,
+  validateMenuRolePut,
   asyncHandler(putMenuRoleController)
 );
 // MenuRoleRoutes.delete(

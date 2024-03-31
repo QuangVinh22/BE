@@ -7,13 +7,26 @@ const {
   getRoleController,
   putRoleController,
 } = require("../controllers/role_controller");
-// const { validateRole } = require("../../middleware/validateRole");
+const {
+  validateRolePost,
+  validateRolePut,
+} = require("../../middleware/validate/validateRole");
 //
 const { verifyAccessToken } = require("../services/jwt_service");
 
-RoleRoutes.post("/post", verifyAccessToken, asyncHandler(postRoleController));
+RoleRoutes.post(
+  "/post",
+  verifyAccessToken,
+  validateRolePost,
+  asyncHandler(postRoleController)
+);
 RoleRoutes.get("/get", verifyAccessToken, asyncHandler(getRoleController));
-RoleRoutes.put("/put", verifyAccessToken, asyncHandler(putRoleController));
+RoleRoutes.put(
+  "/put",
+  verifyAccessToken,
+  validateRolePut,
+  asyncHandler(putRoleController)
+);
 // RoleRoutes.delete(
 //   "/delete",
 //   verifyAccessToken,

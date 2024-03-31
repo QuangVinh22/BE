@@ -10,7 +10,7 @@ const {
   validateRefFloor,
   validateRefFranchise,
   validatedUpdatedBy,
-} = require("../../middleware/validateReferencer");
+} = require("../../middleware/validate/validateReferencer");
 module.exports = {
   getFranchiseService: async (queryParams) => {
     const { id, page, limit } = queryParams;

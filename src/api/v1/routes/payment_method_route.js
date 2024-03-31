@@ -7,13 +7,17 @@ const {
   getPaymentMethodController,
   putPaymentMethodController,
 } = require("../controllers/payment_method_controller");
-// const { validatePaymentMethod } = require("../../middleware/validatePaymentMethod");
-//
+const {
+  validatePaymentMethodPost,
+  validatePaymentMethodPut,
+} = require("../../middleware/validate/validatePayment_Method");
+
 const { verifyAccessToken } = require("../services/jwt_service");
 
 PaymentMethodRoutes.post(
   "/post",
   verifyAccessToken,
+  validatePaymentMethodPost,
   asyncHandler(postPaymentMethodController)
 );
 PaymentMethodRoutes.get(
@@ -24,6 +28,7 @@ PaymentMethodRoutes.get(
 PaymentMethodRoutes.put(
   "/put",
   verifyAccessToken,
+  validatePaymentMethodPut,
   asyncHandler(putPaymentMethodController)
 );
 // PaymentMethodRoutes.delete(

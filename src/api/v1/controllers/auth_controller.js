@@ -6,7 +6,7 @@ const {
 const { OK, CREATED } = require("../../core/success.response.js");
 module.exports = {
   AuthLoginController: async (req, res, next) => {
-    new CREATED({
+    new OK({
       message: "LOGIN OK!",
       metadata: await LoginUserService(req.body),
     }).send(res);

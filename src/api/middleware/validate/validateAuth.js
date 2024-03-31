@@ -1,6 +1,6 @@
 const Joi = require("joi");
 
-const { BadRequestError } = require("../core/error.response"); // Giả sử đây là đường dẫn đến file của bạn
+const { BadRequestError } = require("../../core/error.response"); // Giả sử đây là đường dẫn đến file của bạn
 
 // Định nghĩa schema để validate
 const userRegistrationSchema = Joi.object({
