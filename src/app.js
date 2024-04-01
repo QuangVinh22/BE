@@ -3,6 +3,7 @@ const express = require("express");
 const { default: helmet } = require("helmet");
 const morgan = require("morgan");
 const Database = require("./dbs/init.postgresql.lv0");
+const cors = require("cors");
 
 //
 const AuthRoutes = require("./api/v1/routes/auth_route");
@@ -22,7 +23,12 @@ const QRRoleRoutes = require("./api/v1/routes/qr_role_route");
 const PaymentMethodRoutes = require("./api/v1/routes/payment_method_route");
 const UserRoutes = require("./api/v1/routes/user_route");
 const app = express();
-PaymentMethodRoutes;
+//CORS
+app.use(
+  cors({
+    origin: "http:localhost:5173",
+  })
+);
 //init middleware
 app.use(morgan("dev"));
 app.use(helmet());
