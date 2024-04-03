@@ -30,7 +30,7 @@ module.exports = {
         franchies_id: test.franchies_id,
         role_id: test.role_id,
         status: test.status,
-        createby: test.createby,
+        created_by: test.created_by,
       },
     });
 
@@ -57,7 +57,7 @@ module.exports = {
     }
 
     // Giả sử bạn có hàm SignAccessToken và signRefreshToken để tạo các token
-    const accessToken = await SignAccessToken(foundUser.id);
+    const accessToken = await SignAccessToken(foundUser.id, foundUser.role_id);
     const refreshToken = await signRefreshToken(foundUser.id);
 
     return { accessToken, refreshToken };

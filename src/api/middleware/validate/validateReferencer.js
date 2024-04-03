@@ -22,6 +22,14 @@ module.exports = {
       throw new NotFoundError("Id Người cập nhật không tồn tại");
     }
   },
+  validatedUserId: async (id) => {
+    const userExists = await prisma.users.findUnique({
+      where: { id: id },
+    });
+    if (!userExists) {
+      throw new NotFoundError("Id Người cần cập nhật không tồn tại");
+    }
+  },
   validateRefFloor: async (id) => {
     const isExistFloor = await prisma.floors.findUnique({
       where: { id: id, status: true },

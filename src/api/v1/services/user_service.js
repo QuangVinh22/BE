@@ -10,6 +10,8 @@ const {
   validateRefFloor,
   validatedUpdatedBy,
   validateRefFranchise,
+  validatedUserId,
+  validateRefRole,
 } = require("../../middleware/validate/validateReferencer");
 module.exports = {
   getUsersService: async (queryParams) => {
@@ -48,13 +50,14 @@ module.exports = {
     //check coi Sửa đúng ID ko
 
     //check UserID isExist
-    await validatedUpdatedBy(UserData.id);
+    await validatedUserId(UserData.id);
     //
     const updateUser = await prisma.users.update({
       where: {
         id: UserData.id,
       },
       data: {
+        username: UserData.username,
         franchies_id: UserData.franchies_id,
         role_id: UserData.role_id,
         password: UserData.password,
@@ -64,6 +67,7 @@ module.exports = {
     });
     return updateUser;
   },
+
   //   deleteProductService: async (UserData) => {
   //     const existingProduct = await prisma.Users.findUnique({
   //       where: {

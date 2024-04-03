@@ -12,22 +12,27 @@ const {
   validateRolePermissionsPut,
 } = require("../../middleware/validate/validateRole_Permission");
 //
+const { checkRolePermission } = require("../../middleware/role_middleware");
+//
 const { verifyAccessToken } = require("../services/jwt_service");
 
 RolePermissionRoutes.post(
   "/post",
   verifyAccessToken,
+  checkRolePermission("Create"),
   validateRolePermissionsPost,
   asyncHandler(postRolePermissionController)
 );
 RolePermissionRoutes.get(
   "/get",
   verifyAccessToken,
+  checkRolePermission("Read"),
   asyncHandler(getRolePermissionController)
 );
 RolePermissionRoutes.put(
   "/put",
   verifyAccessToken,
+  checkRolePermission("Update"),
   validateRolePermissionsPut,
   asyncHandler(putRolePermissionController)
 );

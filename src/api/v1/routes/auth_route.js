@@ -9,8 +9,17 @@ const {
   validateUserRegistration,
   validateUserLogin,
 } = require("../../middleware/validate/validateAuth");
+const { checkRolePermission } = require("../../middleware/role_middleware");
+const { verifyAccessToken } = require("../services/jwt_service");
 
-AuthRoutes.post("/register", asyncHandler(AuthRegisterController));
+AuthRoutes.post(
+  "/register",
+  verifyAccessToken,
+
+  checkRolePermission("Create"),
+
+  asyncHandler(AuthRegisterController)
+);
 AuthRoutes.post("/login", validateUserLogin, asyncHandler(AuthLoginController));
 
 module.exports = AuthRoutes;

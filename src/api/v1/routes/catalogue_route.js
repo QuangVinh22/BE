@@ -14,20 +14,24 @@ const {
   validateCataloguePost,
   validateCataloguePut,
 } = require("../../middleware/validate/validateCatalogue");
+const { checkRolePermission } = require("../../middleware/role_middleware");
 CatalogueRoutes.post(
   "/post",
   verifyAccessToken,
+  checkRolePermission("Create"),
   validateCataloguePost,
   asyncHandler(postCatalogueController)
 );
 CatalogueRoutes.get(
   "/get",
   verifyAccessToken,
+  checkRolePermission("Read"),
   asyncHandler(getCatalogueController)
 );
 CatalogueRoutes.put(
   "/put",
   verifyAccessToken,
+  checkRolePermission("Update"),
   validateCataloguePut,
   asyncHandler(putCatalogueController)
 );

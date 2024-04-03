@@ -10,26 +10,17 @@ const {
 // const { validateUser } = require("../../middleware/validateUser");
 //
 const { verifyAccessToken } = require("../services/jwt_service");
-
-UserRoutes.post(
-  "/post",
-  verifyAccessToken,
-  asyncHandler(postUserController)
-);
+const { checkRolePermission } = require("../../middleware/role_middleware");
 UserRoutes.get(
   "/get",
   verifyAccessToken,
+  checkRolePermission("Read"),
   asyncHandler(getUserController)
 );
 UserRoutes.put(
   "/put",
   verifyAccessToken,
+  checkRolePermission("Update"),
   asyncHandler(putUserController)
 );
-// UserRoutes.delete(
-//   "/delete",
-//   verifyAccessToken,
-//   asyncHandler(deleteUserController)
-// );
-
 module.exports = UserRoutes;

@@ -12,6 +12,7 @@ const ReasonStatusCode = {
   CONFLICT: "Conflict Error",
   UNAUTHORIZED: "Unauthorized Error",
   NOTFOUND: "Not Found Error",
+  FORBIDDEN: "Lỗi quyền",
 };
 class ErrorResponse extends Error {
   constructor(message, status) {
@@ -52,9 +53,18 @@ class NotFoundError extends ErrorResponse {
     super(message, statusCode);
   }
 }
+class FORBIDDEN extends ErrorResponse {
+  constructor(
+    message = ReasonStatusCode.FORBIDDEN,
+    statusCode = StatusCode.FORBIDDEN
+  ) {
+    super(message, statusCode);
+  }
+}
 module.exports = {
   BadRequestError,
   ConflictRequestError,
   UnauthorizedError,
   NotFoundError,
+  FORBIDDEN,
 };

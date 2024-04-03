@@ -12,20 +12,24 @@ const {
 } = require("../../middleware/validate/validateProduct");
 
 const { verifyAccessToken } = require("../services/jwt_service");
+const { checkRolePermission } = require("../../middleware/role_middleware");
 ProductRoutes.post(
   "/post",
   verifyAccessToken,
+  checkRolePermission("Create"),
   validateProduct,
   asyncHandler(postProductController)
 );
 ProductRoutes.get(
   "/get",
   verifyAccessToken,
+  checkRolePermission("Read"),
   asyncHandler(getProductController)
 );
 ProductRoutes.put(
   "/put",
   verifyAccessToken,
+  checkRolePermission("Update"),
   asyncHandler(putProductController)
 );
 ProductRoutes.delete(

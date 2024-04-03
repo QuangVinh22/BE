@@ -11,21 +11,25 @@ const {
   validateMenuProductPost,
   validateMenuProductPut,
 } = require("../../middleware/validate/validateMenuProduct");
+const { checkRolePermission } = require("../../middleware/role_middleware");
 
 MenuProductRoutes.post(
   "/post",
   verifyAccessToken,
+  checkRolePermission("Create"),
   validateMenuProductPost,
   asyncHandler(postMenuProductController)
 );
 MenuProductRoutes.get(
   "/get",
   verifyAccessToken,
+  checkRolePermission("Read"),
   asyncHandler(getMenuProductController)
 );
 MenuProductRoutes.put(
   "/put",
   verifyAccessToken,
+  checkRolePermission("Update"),
   validateMenuProductPut,
   asyncHandler(putMenuProductController)
 );

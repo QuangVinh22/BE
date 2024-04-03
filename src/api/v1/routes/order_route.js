@@ -13,17 +13,25 @@ const {
 } = require("../../middleware/validate/validateOrder");
 
 const { verifyAccessToken } = require("../services/jwt_service");
+const { checkRolePermission } = require("../../middleware/role_middleware");
 
 OrderRoutes.post(
   "/post",
   verifyAccessToken,
+  checkRolePermission("Create"),
   validateOrdersPost,
   asyncHandler(postOrderController)
 );
-OrderRoutes.get("/get", verifyAccessToken, asyncHandler(getOrderController));
+OrderRoutes.get(
+  "/get",
+  verifyAccessToken,
+  checkRolePermission("Read"),
+  asyncHandler(getOrderController)
+);
 OrderRoutes.put(
   "/put",
   verifyAccessToken,
+  checkRolePermission("Update"),
   validateOrdersPut,
   asyncHandler(putOrderController)
 );

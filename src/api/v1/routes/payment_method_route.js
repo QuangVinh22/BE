@@ -13,21 +13,25 @@ const {
 } = require("../../middleware/validate/validatePayment_Method");
 
 const { verifyAccessToken } = require("../services/jwt_service");
+const { checkRolePermission } = require("../../middleware/role_middleware");
 
 PaymentMethodRoutes.post(
   "/post",
   verifyAccessToken,
+  checkRolePermission("Create"),
   validatePaymentMethodPost,
   asyncHandler(postPaymentMethodController)
 );
 PaymentMethodRoutes.get(
   "/get",
   verifyAccessToken,
+  checkRolePermission("Read"),
   asyncHandler(getPaymentMethodController)
 );
 PaymentMethodRoutes.put(
   "/put",
   verifyAccessToken,
+  checkRolePermission("Update"),
   validatePaymentMethodPut,
   asyncHandler(putPaymentMethodController)
 );

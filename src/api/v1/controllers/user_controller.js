@@ -16,10 +16,4 @@ module.exports = {
       metadata: await putUsersService(req.body),
     }).send(res);
   },
-  // deleteUserController: async (req, res, next) => {
-  //   new OK({
-  //     message: " Users Deleted: ",
-  //     metadata: await deleteUserService(req.body),
-  //   }).send(res);
-  // },
 };

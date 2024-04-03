@@ -13,10 +13,12 @@ const {
 } = require("../../middleware/validate/validateFranchise");
 //
 const { verifyAccessToken } = require("../services/jwt_service");
+const { checkRolePermission } = require("../../middleware/role_middleware");
 
 FranchiseRoutes.post(
   "/post",
   verifyAccessToken,
+  checkRolePermission("Create"),
   validateFranchisePost,
 
   asyncHandler(postFranchiseController)
@@ -24,11 +26,13 @@ FranchiseRoutes.post(
 FranchiseRoutes.get(
   "/get",
   verifyAccessToken,
+  checkRolePermission("Read"),
   asyncHandler(getFranchiseController)
 );
 FranchiseRoutes.put(
   "/put",
   verifyAccessToken,
+  checkRolePermission("Update"),
   validateFranchisePut,
   asyncHandler(putFranchiseController)
 );
