@@ -2,6 +2,7 @@ const { OK, CREATED } = require("../../core/success.response.js");
 const {
   getUsersService,
   putUsersService,
+  deleteUsersService,
 } = require("../services/user_service.js");
 module.exports = {
   getUserController: async (req, res, next) => {
@@ -11,9 +12,18 @@ module.exports = {
     }).send(res);
   },
   putUserController: async (req, res, next) => {
+    const UserId = req.payload.userId;
     new OK({
       message: " Users Updated: ",
-      metadata: await putUsersService(req.body),
+      metadata: await putUsersService(req.body, UserId),
+    }).send(res);
+  },
+  deleteUserController: async (req, res, next) => {
+    const UserId = req.payload.userId;
+    const id = req.params.id;
+    new OK({
+      message: " Users Soft Deleted: ",
+      metadata: await deleteUsersService(id, UserId),
     }).send(res);
   },
 };

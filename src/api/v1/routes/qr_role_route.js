@@ -6,6 +6,7 @@ const {
   postQRRoleController,
   getQRRoleController,
   putQRRoleController,
+  deleteQRRoleController,
 } = require("../controllers/qr_role_controller");
 const {
   validateQRRolePost,
@@ -35,10 +36,11 @@ QRRoleRoutes.put(
   validateQRRolePut,
   asyncHandler(putQRRoleController)
 );
-// QRRoleRoutes.delete(
-//   "/delete",
-//   verifyAccessToken,
-//   asyncHandler(deleteQRRoleController)
-// );
+QRRoleRoutes.delete(
+  "/delete/:id",
+  verifyAccessToken,
+  checkRolePermission("Delete"),
+  asyncHandler(deleteQRRoleController)
+);
 
 module.exports = QRRoleRoutes;

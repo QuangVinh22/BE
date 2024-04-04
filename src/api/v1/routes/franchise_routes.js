@@ -6,6 +6,7 @@ const {
   postFranchiseController,
   getFranchiseController,
   putFranchiseController,
+  deleteFranchiseController,
 } = require("../controllers/franchise_controller");
 const {
   validateFranchisePut,
@@ -36,10 +37,11 @@ FranchiseRoutes.put(
   validateFranchisePut,
   asyncHandler(putFranchiseController)
 );
-// FranchiseRoutes.delete(
-//   "/delete",
-//   verifyAccessToken,
-//   asyncHandler(deleteFranchiseController)
-// );
+FranchiseRoutes.delete(
+  "/delete/:id",
+  verifyAccessToken,
+  checkRolePermission("Delete"),
+  asyncHandler(deleteFranchiseController)
+);
 
 module.exports = FranchiseRoutes;

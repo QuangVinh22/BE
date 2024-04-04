@@ -3,6 +3,7 @@ const {
   createTablesService,
   getTableService,
   putTableService,
+  deleteTableService,
 } = require("../services/table_service.js");
 module.exports = {
   getTableController: async (req, res, next) => {
@@ -12,21 +13,25 @@ module.exports = {
     }).send(res);
   },
   postTableController: async (req, res, next) => {
+    const UserId = req.payload.userId;
     new CREATED({
       message: "Created  ",
-      metadata: await createTablesService(req.body),
+      metadata: await createTablesService(req.body, UserId),
     }).send(res);
   },
   putTableController: async (req, res, next) => {
+    const UserId = req.payload.userId;
     new OK({
       message: " Tables Updated: ",
-      metadata: await putTableService(req.body),
+      metadata: await putTableService(req.body, UserId),
     }).send(res);
   },
-  // deleteTableController: async (req, res, next) => {
-  //   new OK({
-  //     message: " Tables Deleted: ",
-  //     metadata: await deleteTableService(req.body),
-  //   }).send(res);
-  // },
+  deleteTableController: async (req, res, next) => {
+    const UserId = req.payload.userId;
+    const id = req.params.id;
+    new OK({
+      message: " Tables Deleted: ",
+      metadata: await deleteTableService(id, UserId),
+    }).send(res);
+  },
 };

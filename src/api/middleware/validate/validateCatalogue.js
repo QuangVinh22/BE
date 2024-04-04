@@ -11,11 +11,7 @@ const CataloguePostSchema = Joi.object({
     "string.base": `"Image" must be a string.`,
     "string.uri": `"Image" must be a valid URL.`,
   }),
-  created_by: Joi.number().integer().required().messages({
-    "number.base": `"Created By" must be a number.`,
-    "number.integer": `"Created By" must be an integer.`,
-    "any.required": `"Created By" is a required field.`,
-  }),
+
   status: Joi.boolean().required().messages({
     "boolean.base": `"Status" must be true or false.`,
     "any.required": `"Status" is a required field.`,
@@ -32,11 +28,6 @@ const validateCataloguePutSchema = Joi.object({
   image: Joi.string().uri().messages({
     "string.base": `"Image" must be a string.`,
     "string.uri": `"Image" must be a valid URL.`,
-  }),
-  updated_by: Joi.number().integer().required().messages({
-    "number.base": `"Updated By" must be a number.`,
-    "number.integer": `"Updated By" must be an integer.`,
-    "any.required": `"Updated By" is a required field.`,
   }),
   status: Joi.boolean().required().messages({
     "boolean.base": `"Status" must be true or false.`,

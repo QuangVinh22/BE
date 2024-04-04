@@ -6,6 +6,7 @@ const {
   postRolePermissionController,
   getRolePermissionController,
   putRolePermissionController,
+  deleteRolePermissionController,
 } = require("../controllers/role_permission_controller");
 const {
   validateRolePermissionsPost,
@@ -36,10 +37,11 @@ RolePermissionRoutes.put(
   validateRolePermissionsPut,
   asyncHandler(putRolePermissionController)
 );
-// RolePermissionRoutes.delete(
-//   "/delete",
-//   verifyAccessToken,
-//   asyncHandler(deleteRolePermissionController)
-// );
+RolePermissionRoutes.delete(
+  "/delete/:id",
+  verifyAccessToken,
+  checkRolePermission("Delete"),
+  asyncHandler(deleteRolePermissionController)
+);
 
 module.exports = RolePermissionRoutes;

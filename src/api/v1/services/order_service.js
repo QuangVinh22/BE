@@ -13,6 +13,7 @@ const {
   validateRefPaymentMethod,
   validatedUpdatedBy,
   validateCreatedBy,
+  validateRefOrderDetails,
 } = require("../../middleware/validate/validateReferencer");
 module.exports = {
   getOrderService: async (queryParams) => {
@@ -22,7 +23,7 @@ module.exports = {
     if (id) {
       // Fetch Order by ID
       const holderOrder = await prisma.orders.findUnique({
-        where: { id: parseInt(id), status: true },
+        where: { id: parseInt(id) },
       });
       if (!holderOrder) throw new BadRequestError("Id Order  không tồn tại");
       return [holderOrder]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
@@ -43,7 +44,7 @@ module.exports = {
 
     return Order;
   },
-  createOrdersService: async (Order) => {
+  createOrdersService: async (Order, userId) => {
     //check id chi nhánh
     await validateRefFranchise(Order.franchise_id);
     //check id floor
@@ -53,7 +54,7 @@ module.exports = {
     //check payment method id
     await validateRefPaymentMethod(Order.payment_method_id);
     //check createdby
-    await validateCreatedBy(Order.created_by);
+
     const vatAmount = Order.price * (Order.vat / 100);
     const cost = Order.price + vatAmount;
     const totalAfterDiscount = cost - cost * (Order.discount / 100);
@@ -69,13 +70,13 @@ module.exports = {
         cost: cost,
         discount: Order.discount,
         total_after_discount: totalAfterDiscount,
-        created_by: Order.created_by,
+        created_by: userId,
         status: Order.status,
       },
     });
     return newOrder;
   },
-  putOrderService: async (OrderData) => {
+  putOrderService: async (OrderData, userId) => {
     //check id order cần sửa có tồn tại k
     await validateRefOrder(OrderData.id);
     //check id chi nhánh
@@ -87,7 +88,7 @@ module.exports = {
     //check payment method id
     await validateRefPaymentMethod(OrderData.payment_method_id);
     //check update by
-    await validatedUpdatedBy(OrderData.updated_by);
+
     //Vat cost bằng tiền ban đầu + thuế
     const vatAmount = OrderData.price * (OrderData.vat / 100);
     const cost = OrderData.price + vatAmount;
@@ -107,13 +108,41 @@ module.exports = {
         cost: cost,
         discount: OrderData.discount,
         total_after_discount: totalAfterDiscount,
-        updated_by: OrderData.updated_by,
+        updated_by: userId,
         status: OrderData.status,
       },
     });
-    if (!updateOrder) throw new NotFoundError("Ko tìm thấy ID Order cần sửa");
+
     return updateOrder;
   },
+  deleteOrderService: async (id, userId) => {
+    //parseString to Int ID
+    const Id = parseInt(id);
+
+    //check FranchiseId isExist
+    await validateRefOrder(Id);
+    //
+    const Orders = await prisma.orders.findUnique({
+      where: {
+        id: Id,
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    const updateOrder = await prisma.orders.update({
+      where: {
+        id: Id,
+      },
+      data: {
+        updated_by: userId,
+        status: !Orders.status,
+      },
+    });
+    return updateOrder;
+  },
+
   //   deleteProductService: async (OrderData) => {
   //     const existingProduct = await prisma.Orders.findUnique({
   //       where: {

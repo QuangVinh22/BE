@@ -6,6 +6,7 @@ const {
   postFloorController,
   getFloorController,
   putFloorController,
+  deleteFloorController,
 } = require("../controllers/floor_controller");
 const {
   validateFloorsPost,
@@ -35,10 +36,11 @@ FloorRoutes.put(
   checkRolePermission("Update"),
   asyncHandler(putFloorController)
 );
-// FloorRoutes.delete(
-//   "/delete",
-//   verifyAccessToken,
-//   asyncHandler(deleteFloorController)
-// );
+FloorRoutes.delete(
+  "/delete/:id",
+  verifyAccessToken,
+  checkRolePermission("Delete"),
+  asyncHandler(deleteFloorController)
+);
 
 module.exports = FloorRoutes;

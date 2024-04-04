@@ -60,6 +60,13 @@ const client = require("./helpers/connect_redis");
 //
 
 //handle error
+app.use((req, res, next) => {
+  res.status(404).json({
+    status: "error",
+    code: 404,
+    messages: "Not Found",
+  });
+});
 app.use((error, req, res, next) => {
   const status = error.status || 500;
   return res.status(status).json({
@@ -68,6 +75,7 @@ app.use((error, req, res, next) => {
     messages: error.message || "Internal Server Error",
   });
 });
+
 //
 process.on("SIGINT", async () => {
   await db.disconnect();

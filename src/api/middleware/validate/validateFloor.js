@@ -20,11 +20,7 @@ const validateFloorsPost = (req, res, next) => {
     description: Joi.string().allow("").optional().messages({
       "string.base": `"Description" must be a string.`,
     }),
-    created_by: Joi.number().integer().required().messages({
-      "number.base": `"Created By" must be a number.`,
-      "number.integer": `"Created By" must be an integer.`,
-      "any.required": `"Created By" is a required field.`,
-    }),
+
     status: Joi.boolean().required().messages({
       "boolean.base": `"Status" must be true or false.`,
       "any.required": `"Status" is a required field.`,
@@ -58,11 +54,7 @@ const validateFloorsPut = (req, res, next) => {
     description: Joi.string().allow("").optional().messages({
       "string.base": `"Description" must be a string.`,
     }),
-    updated_by: Joi.number().integer().required().messages({
-      "number.base": `"Updated By" must be a number.`,
-      "number.integer": `"Updated By" must be an integer.`,
-      "any.required": `"Updated By" is a required field.`,
-    }),
+
     status: Joi.boolean().required().messages({
       "boolean.base": `"Status" must be true or false.`,
       "any.required": `"Status" is a required field.`,

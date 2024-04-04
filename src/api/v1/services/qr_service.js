@@ -20,7 +20,7 @@ module.exports = {
     if (id) {
       // Fetch QR by ID
       const holderQR = await prisma.qr.findUnique({
-        where: { id: parseInt(id), status: true },
+        where: { id: parseInt(id) },
       });
       if (!holderQR) throw new BadRequestError("Id QR  không tồn tại");
       return [holderQR]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
@@ -41,7 +41,7 @@ module.exports = {
 
     return QR;
   },
-  createQRsService: async (QR) => {
+  createQRsService: async (QR, userId) => {
     const vatAmount = QR.price * (QR.vat / 100);
     const cost = QR.price + vatAmount;
     const totalAfterDiscount = cost - cost * (QR.discount / 100);
@@ -50,23 +50,23 @@ module.exports = {
     //checkTable
     await validateRefTable(QR.table_id);
     //CreatedBy
-    await validateCreatedBy(QR.created_by);
+
     const newQR = await prisma.qr.create({
       data: {
         order_id: QR.order_id,
         table_id: QR.table_id,
-        created_by: QR.created_by,
+        created_by: userId,
         status: QR.status,
       },
     });
     return newQR;
   },
-  putQRService: async (QRData) => {
+  putQRService: async (QRData, userId) => {
     const vatAmount = QRData.price * (QRData.vat / 100);
     const cost = QRData.price + vatAmount;
     const totalAfterDiscount = cost - cost * (QRData.discount / 100);
     //checkupdate
-    await validatedUpdatedBy(QRData.updated_by);
+
     //Order
     await validateRefOrder(QRData.order_id);
     //Check table is exist
@@ -80,8 +80,35 @@ module.exports = {
       data: {
         order_id: QRData.order_id,
         table_id: QRData.table_id,
-        updated_by: QRData.updated_by,
+        updated_by: userId,
         status: QRData.status,
+      },
+    });
+    return updateQR;
+  },
+  deleteQRService: async (id, userId) => {
+    //parseString to Int ID
+    const Id = parseInt(id);
+
+    //check QRId isExist
+    await validateRefQR(Id);
+    //
+    const QR = await prisma.qr.findUnique({
+      where: {
+        id: Id,
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    const updateQR = await prisma.qr.update({
+      where: {
+        id: Id,
+      },
+      data: {
+        updated_by: userId,
+        status: !QR.status,
       },
     });
     return updateQR;

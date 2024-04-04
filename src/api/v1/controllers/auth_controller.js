@@ -12,9 +12,10 @@ module.exports = {
     }).send(res);
   },
   AuthRegisterController: async (req, res, next) => {
+    const UserId = req.payload.userId;
     new CREATED({
       message: "Register OK!",
-      metadata: await RegisterUserService(req.body),
+      metadata: await RegisterUserService(req.body, UserId),
     }).send(res);
   },
 };

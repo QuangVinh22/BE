@@ -22,14 +22,6 @@ const MenuProductValidationSchema = Joi.object({
 
 // Usage example
 const validateMenuProductPost = (req, res, next) => {
-  const postSchema = MenuProductValidationSchema.append({
-    created_by: Joi.number().integer().required().messages({
-      "number.base": `"Created By" must be a number.`,
-      "number.integer": `"Created By" must be an integer.`,
-      "any.required": `"Created By" is a required field.`,
-    }),
-  });
-
   const { error } = postSchema.validate(req.body);
   if (error) {
     throw new BadRequestError(error.details[0].message);
@@ -37,14 +29,6 @@ const validateMenuProductPost = (req, res, next) => {
   next();
 };
 const validateMenuProductPut = (req, res, next) => {
-  const putSchema = MenuProductValidationSchema.append({
-    updated_by: Joi.number().integer().required().messages({
-      "number.base": `"Updated By" must be a number.`,
-      "number.integer": `"Updated By" must be an integer.`,
-      "any.required": `"Updated By" is a required field.`,
-    }),
-  });
-
   const { error } = putSchema.validate(req.body);
   if (error) {
     throw new BadRequestError(error.details[0].message);

@@ -11,7 +11,7 @@ const {
   signRefreshToken,
 } = require("../services/jwt_service");
 module.exports = {
-  RegisterUserService: async (test) => {
+  RegisterUserService: async (test, userId) => {
     const holderUser = await prisma.users.findMany({
       where: {
         email: test.email,
@@ -30,7 +30,7 @@ module.exports = {
         franchies_id: test.franchies_id,
         role_id: test.role_id,
         status: test.status,
-        created_by: test.created_by,
+        created_by: userId,
       },
     });
 

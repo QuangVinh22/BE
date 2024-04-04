@@ -18,7 +18,7 @@ module.exports = {
     if (id) {
       // Fetch product by ID
       const product = await prisma.products.findUnique({
-        where: { id: parseInt(id), status: true },
+        where: { id: parseInt(id) },
       });
       if (!product) throw new NotFoundError("Id Product doest không tồn tại");
       return [product]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
@@ -39,10 +39,7 @@ module.exports = {
 
     return products;
   },
-  createProductsService: async (product) => {
-    //check user tạo sản phẩm có tồn tại ko mới cho tạo
-    await validateCreatedBy(product.created_by);
-
+  createProductsService: async (product, userId) => {
     const vatAmount = product.price * (product.vat / 100);
     //tính tiền sau thuế
     const cost = product.price + vatAmount;
@@ -54,7 +51,7 @@ module.exports = {
         price: product.price,
         vat: product.vat,
         cost: cost,
-        created_by: product.created_by,
+        created_by: userId,
         status: product.status,
       },
     });
@@ -62,7 +59,7 @@ module.exports = {
   },
   putProductService: async (ProductData) => {
     //check user update có tồn tài k mới cho sửa
-    await validatedUpdatedBy(ProductData.updated_by);
+
     // Check coi product cần update có tồn tại k
     await validateRefProduct(ProductData.id);
     //Tính tiền sau thuế
@@ -81,33 +78,37 @@ module.exports = {
         price: ProductData.price,
         vat: ProductData.vat,
         cost: cost,
-        updated_by: ProductData.updated_by,
+        updated_by: ProductData.userId,
         status: ProductData.status,
       },
     });
     return updateProduct;
   },
-  deleteProductService: async (ProductData) => {
-    const existingProduct = await prisma.products.findUnique({
+  deleteProductService: async (id, userId) => {
+    //parseString to Int ID
+    const Id = parseInt(id);
+
+    //check ProductId isExist
+    await validateRefProduct(Id);
+    //
+    const Product = await prisma.products.findUnique({
       where: {
-        id: ProductData.id,
+        id: Id,
+      },
+      select: {
+        status: true,
       },
     });
 
-    // Nếu không tìm thấy sản phẩm, ném ra lỗi
-    if (!existingProduct) {
-      throw new BadRequestError("Ko tìm thấy ID Sản Phẩm cần xóa");
-    }
-
-    // Nếu sản phẩm tồn tại, thực hiện soft delete bằng cách cập nhật trạng thái thành false
-    const updatedProduct = await prisma.products.update({
+    const updateProduct = await prisma.products.update({
       where: {
-        id: ProductData.id,
+        id: Id,
       },
       data: {
-        status: false,
+        updated_by: userId,
+        status: !Product.status,
       },
     });
-    return updatedProduct;
+    return updateProduct;
   },
 };

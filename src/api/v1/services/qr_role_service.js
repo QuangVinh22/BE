@@ -20,7 +20,7 @@ module.exports = {
     if (id) {
       // Fetch QRRole by ID
       const holderQRRole = await prisma.qr_role.findUnique({
-        where: { id: parseInt(id), status: true },
+        where: { id: parseInt(id) },
       });
       if (!holderQRRole) throw new BadRequestError("Id QRRole  không tồn tại");
       return [holderQRRole]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
@@ -41,30 +41,30 @@ module.exports = {
 
     return QRRole;
   },
-  createQRRolesService: async (QRRole) => {
+  createQRRolesService: async (QRRole, userId) => {
     //check franchise
     await validateRefFranchise(QRRole.franchise_id);
     //check Role
     await validateRefRole(QRRole.role_id);
     //check createdby
-    await validateCreatedBy(QRRole.created_by);
+
     const newQRRole = await prisma.qr_role.create({
       data: {
         franchise_id: QRRole.franchise_id,
         max_qr_codes: QRRole.max_qr_codes,
         role_id: QRRole.role_id,
-        created_by: QRRole.created_by,
+        created_by: userId,
         status: QRRole.status,
       },
     });
     return newQRRole;
   },
-  putQRRoleService: async (QRRoleData) => {
+  putQRRoleService: async (QRRoleData, userId) => {
     const vatAmount = QRRoleData.price * (QRRoleData.vat / 100);
     const cost = QRRoleData.price + vatAmount;
     const totalAfterDiscount = cost - cost * (QRRoleData.discount / 100);
     //updatedby
-    await validatedUpdatedBy(QRRoleData.updated_by);
+
     //franchise
     await validateRefFranchise(QRRoleData.franchise_id);
     //roleID
@@ -79,11 +79,38 @@ module.exports = {
         franchise_id: QRRoleData.franchise_id,
         max_qr_codes: QRRoleData.max_qr_codes,
         role_id: QRRoleData.role_id,
-        updated_by: QRRoleData.updated_by,
+        updated_by: userId,
         status: QRRoleData.status,
       },
     });
     return updateQRRole;
+  },
+  deleteQrRoleService: async (id, userId) => {
+    //parseString to Int ID
+    const Id = parseInt(id);
+
+    //check FranchiseId isExist
+    await validateRefQRRole(Id);
+    //
+    const QrRole = await prisma.qr_role.findUnique({
+      where: {
+        id: Id,
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    const updateQrRole = await prisma.qr_role.update({
+      where: {
+        id: Id,
+      },
+      data: {
+        updated_by: userId,
+        status: !QrRole.status,
+      },
+    });
+    return updateQrRole;
   },
   //   deleteProductService: async (QRRoleData) => {
   //     const existingProduct = await prisma.QRRoles.findUnique({

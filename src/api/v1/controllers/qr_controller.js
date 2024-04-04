@@ -3,6 +3,7 @@ const {
   getQRService,
   createQRsService,
   putQRService,
+  deleteQRService,
 } = require("../services/qr_service.js");
 module.exports = {
   getQRController: async (req, res, next) => {
@@ -12,21 +13,25 @@ module.exports = {
     }).send(res);
   },
   postQRController: async (req, res, next) => {
+    const UserId = req.payload.userId;
     new CREATED({
       message: "Created  ",
-      metadata: await createQRsService(req.body),
+      metadata: await createQRsService(req.body, UserId),
     }).send(res);
   },
   putQRController: async (req, res, next) => {
+    const UserId = req.payload.userId;
     new OK({
       message: " QRs Updated: ",
-      metadata: await putQRService(req.body),
+      metadata: await putQRService(req.body, UserId),
     }).send(res);
   },
-  // deleteQRController: async (req, res, next) => {
-  //   new OK({
-  //     message: " QRs Deleted: ",
-  //     metadata: await deleteQRService(req.body),
-  //   }).send(res);
-  // },
+  deleteQRController: async (req, res, next) => {
+    const UserId = req.payload.userId;
+    const id = req.params.id;
+    new OK({
+      message: " QRs Deleted: ",
+      metadata: await deleteQRService(id, UserId),
+    }).send(res);
+  },
 };

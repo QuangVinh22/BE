@@ -6,6 +6,7 @@ const {
   postRoleController,
   getRoleController,
   putRoleController,
+  deleteRoleController,
 } = require("../controllers/role_controller");
 const {
   validateRolePost,
@@ -34,10 +35,11 @@ RoleRoutes.put(
   validateRolePut,
   asyncHandler(putRoleController)
 );
-// RoleRoutes.delete(
-//   "/delete",
-//   verifyAccessToken,
-//   asyncHandler(deleteRoleController)
-// );
+RoleRoutes.delete(
+  "/delete/:id",
+  verifyAccessToken,
+  checkRolePermission("Delete"),
+  asyncHandler(deleteRoleController)
+);
 
 module.exports = RoleRoutes;

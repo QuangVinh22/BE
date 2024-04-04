@@ -18,11 +18,7 @@ const validateQRRolePost = (req, res, next) => {
       "number.integer": `"Role ID" must be an integer.`,
       "any.required": `"Role ID" is a required field.`,
     }),
-    created_by: Joi.number().integer().required().messages({
-      "number.base": `"Created By" must be a number.`,
-      "number.integer": `"Created By" must be an integer.`,
-      "any.required": `"Created By" is a required field.`,
-    }),
+
     status: Joi.boolean().required().messages({
       "boolean.base": `"Status" must be true or false.`,
       "any.required": `"Status" is a required field.`,
@@ -54,11 +50,7 @@ const validateQRRolePut = (req, res, next) => {
       "number.base": `"Role ID" must be a number.`,
       "number.integer": `"Role ID" must be an integer.`,
     }),
-    updated_by: Joi.number().integer().required().messages({
-      "number.base": `"Updated By" must be a number.`,
-      "number.integer": `"Updated By" must be an integer.`,
-      "any.required": `"Updated By" is a required field.`,
-    }),
+
     status: Joi.boolean().required().messages({
       "boolean.base": `"Status" must be true or false.`,
       "any.required": `"Status" is a required field.`,

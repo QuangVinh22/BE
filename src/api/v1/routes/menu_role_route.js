@@ -6,6 +6,7 @@ const {
   postMenuRoleController,
   getMenuRoleController,
   putMenuRoleController,
+  deleteMenuRoleController,
 } = require("../controllers/menu_role_controller");
 const {
   validateMenuRolePost,
@@ -35,10 +36,11 @@ MenuRoleRoutes.put(
   validateMenuRolePut,
   asyncHandler(putMenuRoleController)
 );
-// MenuRoleRoutes.delete(
-//   "/delete",
-//   verifyAccessToken,
-//   asyncHandler(deleteMenuRoleController)
-// );
+MenuRoleRoutes.delete(
+  "/delete/:id",
+  verifyAccessToken,
+  checkRolePermission("Delete"),
+  asyncHandler(deleteMenuRoleController)
+);
 
 module.exports = MenuRoleRoutes;

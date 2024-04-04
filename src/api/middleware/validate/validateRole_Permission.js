@@ -12,11 +12,7 @@ const validateRolePermissionsPost = (req, res, next) => {
       "string.base": `"Name" must be a string.`,
       "any.required": `"Name" is a required field.`,
     }),
-    created_by: Joi.number().integer().required().messages({
-      "number.base": `"Created By" must be a number.`,
-      "number.integer": `"Created By" must be an integer.`,
-      "any.required": `"Created By" is a required field.`,
-    }),
+
     status: Joi.boolean().required().messages({
       "boolean.base": `"Status" must be true or false.`,
       "any.required": `"Status" is a required field.`,
@@ -43,11 +39,7 @@ const validateRolePermissionsPut = (req, res, next) => {
     name: Joi.string().optional().messages({
       "string.base": `"Name" must be a string.`,
     }),
-    updated_by: Joi.number().integer().required().messages({
-      "number.base": `"Updated By" must be a number.`,
-      "number.integer": `"Updated By" must be an integer.`,
-      "any.required": `"Updated By" is a required field.`,
-    }),
+
     status: Joi.boolean().required().messages({
       "boolean.base": `"Status" must be true or false.`,
       "any.required": `"Status" is a required field.`,

@@ -29,11 +29,7 @@ const validateOrdersDetailPost = (req, res, next) => {
     discount: Joi.number().precision(2).optional().allow("").messages({
       "number.base": `"Discount" must be a number.`,
     }),
-    created_by: Joi.number().integer().required().messages({
-      "number.base": `"Created By" must be a number.`,
-      "number.integer": `"Created By" must be an integer.`,
-      "any.required": `"Created By" is a required field.`,
-    }),
+
     status: Joi.boolean().required().messages({
       "boolean.base": `"Status" must be true or false.`,
       "any.required": `"Status" is a required field.`,
@@ -75,11 +71,7 @@ const validateOrdersDetailPut = (req, res, next) => {
     discount: Joi.number().precision(2).optional().allow("").messages({
       "number.base": `"Discount" must be a number.`,
     }),
-    updated_by: Joi.number().integer().required().messages({
-      "number.base": `"Updated By" must be a number.`,
-      "number.integer": `"Updated By" must be an integer.`,
-      "any.required": `"Updated By" is a required field.`,
-    }),
+
     status: Joi.boolean().required().messages({
       "boolean.base": `"Status" must be true or false.`,
     }),

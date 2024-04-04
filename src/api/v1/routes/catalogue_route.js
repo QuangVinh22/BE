@@ -6,6 +6,7 @@ const {
   postCatalogueController,
   getCatalogueController,
   putCatalogueController,
+  deleteCatalogueController,
 } = require("../controllers/catalogue_controller");
 // const { validateCatalogue } = require("../../middleware/validateCatalogue");
 //
@@ -35,10 +36,11 @@ CatalogueRoutes.put(
   validateCataloguePut,
   asyncHandler(putCatalogueController)
 );
-// CatalogueRoutes.delete(
-//   "/delete",
-//   verifyAccessToken,
-//   asyncHandler(deleteCatalogueController)
-// );
+CatalogueRoutes.delete(
+  "/delete/:id",
+  verifyAccessToken,
+  checkRolePermission("Delete"),
+  asyncHandler(deleteCatalogueController)
+);
 
 module.exports = CatalogueRoutes;

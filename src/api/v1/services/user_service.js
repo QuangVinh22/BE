@@ -21,7 +21,7 @@ module.exports = {
     if (id) {
       // Fetch Users by ID
       const holderUsers = await prisma.users.findUnique({
-        where: { id: parseInt(id), status: true },
+        where: { id: parseInt(id) },
       });
       if (!holderUsers) throw new NotFoundError("Id User  không tồn tại");
       return [holderUsers];
@@ -44,7 +44,6 @@ module.exports = {
   },
 
   putUsersService: async (UserData) => {
-    await validatedUpdatedBy(UserData.updated_by);
     //
     await validateRefFranchise(UserData.franchies_id);
     //check coi Sửa đúng ID ko
@@ -66,6 +65,33 @@ module.exports = {
       },
     });
     return updateUser;
+  },
+  deleteUsersService: async (id, userId) => {
+    //parseString to Int ID
+    const Id = parseInt(id);
+
+    //check UsersId isExist
+    //
+    await validatedUserId(Id);
+    const Users = await prisma.users.findUnique({
+      where: {
+        id: Id,
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    const updateUsers = await prisma.users.update({
+      where: {
+        id: Id,
+      },
+      data: {
+        updated_by: userId,
+        status: !Users.status,
+      },
+    });
+    return updateUsers;
   },
 
   //   deleteProductService: async (UserData) => {

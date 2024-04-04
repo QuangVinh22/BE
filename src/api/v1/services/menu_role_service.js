@@ -14,7 +14,7 @@ module.exports = {
     if (id) {
       // Fetch MenuRole by ID
       const holderMenuRole = await prisma.menu_role.findUnique({
-        where: { id: parseInt(id), status: true },
+        where: { id: parseInt(id) },
       });
       if (!holderMenuRole)
         throw new BadRequestError("Id MenuRole  không tồn tại");
@@ -36,9 +36,9 @@ module.exports = {
 
     return MenuRole;
   },
-  createMenuRolesService: async (MenuRole) => {
+  createMenuRolesService: async (MenuRole, userId) => {
     //check coi MenuRole này được tạo bởi user có tồn tại k
-    await validateCreatedBy(MenuRole.created_by);
+
     //Check Role Permission tham chiếu tới có tồn tại k
     await validateRefRolePermission(MenuRole.role_permissions_id);
     const newMenuRole = await prisma.menu_role.create({
@@ -46,15 +46,13 @@ module.exports = {
         role_permissions_id: MenuRole.role_permissions_id,
         function_url: MenuRole.function_url,
         function_name: MenuRole.function_name,
-        created_by: MenuRole.created_by,
+        created_by: userId,
         status: MenuRole.status,
       },
     });
     return newMenuRole;
   },
-  putMenuRoleService: async (MenuRoleData) => {
-    //Check coi bảng này được Update bởi user có tồn tại k
-    await validatedUpdatedBy(MenuRoleData.updated_by);
+  putMenuRoleService: async (MenuRoleData, userId) => {
     //Check Role Permission tham chiếu tới có tồn tại k
     await validateRefRolePermission(MenuRoleData.role_permissions_id);
     //Check MenuRole cần sửa có tồn tại hay k
@@ -67,8 +65,35 @@ module.exports = {
         role_permissions_id: MenuRoleData.role_permissions_id,
         function_url: MenuRoleData.function_url,
         function_name: MenuRoleData.function_name,
-        updated_by: MenuRoleData.updated_by,
+        updated_by: userId,
         status: MenuRoleData.status,
+      },
+    });
+    return updateMenuRole;
+  },
+  deleteMenuRoleService: async (id, userId) => {
+    //parseString to Int ID
+    const Id = parseInt(id);
+
+    //check MenuRoleId isExist
+    await validateRefMenuRole(Id);
+    //
+    const MenuRole = await prisma.menu_role.findUnique({
+      where: {
+        id: Id,
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    const updateMenuRole = await prisma.menu_role.update({
+      where: {
+        id: Id,
+      },
+      data: {
+        updated_by: userId,
+        status: !MenuRole.status,
       },
     });
     return updateMenuRole;

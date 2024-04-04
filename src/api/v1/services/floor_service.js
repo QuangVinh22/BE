@@ -19,7 +19,7 @@ module.exports = {
     if (id) {
       // Fetch Floor by ID
       const holderFloor = await prisma.floors.findUnique({
-        where: { id: parseInt(id), status: true },
+        where: { id: parseInt(id) },
       });
       if (!holderFloor) throw new BadRequestError("Id Floor  không tồn tại");
       return [holderFloor]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
@@ -40,9 +40,8 @@ module.exports = {
 
     return Floor;
   },
-  createFloorsService: async (Floor) => {
+  createFloorsService: async (Floor, UserId) => {
     //check coi Floor này được tạo bởi user nào
-    await validateCreatedBy(Floor.created_by);
     //Check id chi nhánh muốn thêm có tồn tại k
     await validateRefFranchise(Floor.franchise_id);
     const newFloor = await prisma.floors.create({
@@ -51,14 +50,13 @@ module.exports = {
         floor_number: Floor.floor_number,
         floor_name: Floor.floor_name,
         description: Floor.description,
-        created_by: Floor.created_by,
+        created_by: UserId,
         status: Floor.status,
       },
     });
     return newFloor;
   },
-  putFloorService: async (FloorData) => {
-    await validatedUpdatedBy(FloorData.updated_by);
+  putFloorService: async (FloorData, UserId) => {
     //check chi nhánh
     await validateRefFranchise(FloorData.franchise_id);
     //Check coi lầu muốn sửa có tồn tại k
@@ -72,8 +70,32 @@ module.exports = {
         floor_number: FloorData.Floor_numbers,
         floor_name: FloorData.floor_name,
         description: FloorData.description,
-        updated_by: FloorData.updated_by,
+        updated_by: UserId,
         status: FloorData.status,
+      },
+    });
+    return updateFloor;
+  },
+  //soft deleted
+  deleteFloorService: async (id, UserId) => {
+    //check UpdateBy isExist
+    //phải chuyển sang Int vì params là String
+    const Id = parseInt(id);
+    //check FloorId isExist
+    await validateRefFloor(Id);
+    //
+    const holderFloor = await prisma.floors.findUnique({
+      where: { id: Id },
+      //chỉ select status cho nhẹ truy vấn
+      select: { status: true },
+    });
+    const updateFloor = await prisma.floors.update({
+      where: {
+        id: Id,
+      },
+      data: {
+        updated_by: UserId,
+        status: !holderFloor.status,
       },
     });
     return updateFloor;

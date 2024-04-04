@@ -33,8 +33,9 @@ ProductRoutes.put(
   asyncHandler(putProductController)
 );
 ProductRoutes.delete(
-  "/delete",
+  "/delete/:id",
   verifyAccessToken,
+  checkRolePermission("Delete"),
   asyncHandler(deleteProductController)
 );
 

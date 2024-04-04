@@ -27,15 +27,6 @@ const productValidationSchema = Joi.object({
     "any.required": `"VAT" is a required field.`,
   }),
 
-  updated_by: Joi.number().integer().messages({
-    "number.base": `"Updated By" must be a number.`,
-    "number.integer": `"Updated By" must be an integer.`,
-  }),
-  created_by: Joi.number().integer().required().messages({
-    "number.base": `"Created By" must be a number.`,
-    "number.integer": `"Created By" must be an integer.`,
-    "any.required": `"Created By" is a required field.`,
-  }),
   status: Joi.boolean().required().messages({
     "boolean.base": `"Status" must be true or false.`,
     "any.required": `"Status" is a required field.`,

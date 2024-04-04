@@ -20,7 +20,7 @@ module.exports = {
     if (id) {
       // Fetch product by ID
       const menuProduct = await prisma.menu_products.findUnique({
-        where: { id: parseInt(id), status: true },
+        where: { id: parseInt(id) },
       });
       if (!menuProduct)
         throw new NotFoundError("Id Menu Product doest not exist");
@@ -39,9 +39,7 @@ module.exports = {
 
     return menuProducts;
   },
-  createMenuProductsService: async (MenuProduct) => {
-    //Check User Created By phải tồn tại
-    await validateCreatedBy(MenuProduct.created_by);
+  createMenuProductsService: async (MenuProduct, userId) => {
     //Check Product tham chiếu trong bảng product có tồn tại k
     await validateRefProduct(MenuProduct.product_id);
     //
@@ -52,31 +50,22 @@ module.exports = {
         name: MenuProduct.name,
         product_id: MenuProduct.product_id,
         catalogue_id: MenuProduct.catalogue_id,
-        created_by: MenuProduct.created_by,
+        created_by: userId,
         status: MenuProduct.status,
       },
     });
     return newProduct;
   },
-  putMenuProductService: async (MenuProductData) => {
+  putMenuProductService: async (MenuProductData, userId) => {
     //check Menu Product cần sửa có tồn tại k
     await validateRefMenuProduct(MenuProductData.id);
-    //check id cần sửa của menu product có tồn tại k
-    await validatedUpdatedBy(MenuProductData.updated_by);
+
     //Check Product tham chiếu trong bảng product có tồn tại k
     await validateRefProduct(MenuProductData.product_id);
     //Check Catalogue
     await validateRefCatalogue(MenuProductData.catalogue_id);
     //
-    const holderCatalogue = await prisma.catalogue.findUnique({
-      where: {
-        id: MenuProductData.catalogue_id,
-      },
-    });
-    if (!holderCatalogue) {
-      throw new NotFoundError("Error: CatalogueJD does not exist!");
-    }
-    //
+
     const updatedProduct = await prisma.menu_products.update({
       where: {
         id: MenuProductData.id,
@@ -85,18 +74,37 @@ module.exports = {
         name: MenuProductData.name,
         product_id: MenuProductData.product_id,
         catalogue_id: MenuProductData.catalogue_id,
-        updated_by: MenuProductData.updated_by,
+        updated_by: userId,
         status: MenuProductData.status,
       },
     });
     return updatedProduct;
   },
-  deleteMenuProductService: async (MenuProductData) => {
-    const deleteProduct = await prisma.products.delete({
+  deleteMenuProductService: async (id, userId) => {
+    //parseString to Int ID
+    const Id = parseInt(id);
+
+    //check MenuProductId isExist
+    await validateRefMenuProduct(Id);
+    //
+    const MenuProduct = await prisma.menu_products.findUnique({
       where: {
-        id: MenuProductData.id,
+        id: Id,
+      },
+      select: {
+        status: true,
       },
     });
-    return deleteProduct;
+
+    const updateMenuProduct = await prisma.menu_products.update({
+      where: {
+        id: Id,
+      },
+      data: {
+        updated_by: userId,
+        status: !MenuProduct.status,
+      },
+    });
+    return updateMenuProduct;
   },
 };

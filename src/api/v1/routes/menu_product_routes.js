@@ -5,6 +5,8 @@ const {
   postMenuProductController,
   getMenuProductController,
   putMenuProductController,
+
+  deleteMenuProductController,
 } = require("../controllers/menu_product_controller");
 const { verifyAccessToken } = require("../services/jwt_service");
 const {
@@ -33,10 +35,11 @@ MenuProductRoutes.put(
   validateMenuProductPut,
   asyncHandler(putMenuProductController)
 );
-// ProductRoutes.delete(
-//   "/delete",
-//   verifyAccessToken,
-//   asyncHandler(deleteProductController)
-// );
+MenuProductRoutes.delete(
+  "/delete/:id",
+  verifyAccessToken,
+  checkRolePermission("Delete"),
+  asyncHandler(deleteMenuProductController)
+);
 
 module.exports = MenuProductRoutes;

@@ -6,6 +6,7 @@ const {
   postUserController,
   getUserController,
   putUserController,
+  deleteUserController,
 } = require("../controllers/user_controller");
 // const { validateUser } = require("../../middleware/validateUser");
 //
@@ -23,4 +24,11 @@ UserRoutes.put(
   checkRolePermission("Update"),
   asyncHandler(putUserController)
 );
+UserRoutes.delete(
+  "/delete/:id",
+  verifyAccessToken,
+  checkRolePermission("Delete"),
+  asyncHandler(deleteUserController)
+);
+
 module.exports = UserRoutes;

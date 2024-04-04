@@ -13,21 +13,25 @@ module.exports = {
     }).send(res);
   },
   postProductController: async (req, res, next) => {
+    const UserId = req.payload.userId;
     new CREATED({
       message: "Created  ",
-      metadata: await createProductsService(req.body),
+      metadata: await createProductsService(req.body, UserId),
     }).send(res);
   },
   putProductController: async (req, res, next) => {
+    const UserId = req.payload.userId;
     new OK({
       message: " Products Updated: ",
-      metadata: await putProductService(req.body),
+      metadata: await putProductService(req.body, UserId),
     }).send(res);
   },
   deleteProductController: async (req, res, next) => {
+    const UserId = req.payload.userId;
+    const id = req.params.id;
     new OK({
       message: " Products Deleted: ",
-      metadata: await deleteProductService(req.body),
+      metadata: await deleteProductService(id, UserId),
     }).send(res);
   },
 };

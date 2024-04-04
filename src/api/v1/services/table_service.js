@@ -19,7 +19,7 @@ module.exports = {
     if (id) {
       // Fetch table by ID
       const holderTable = await prisma.tables.findUnique({
-        where: { id: parseInt(id), status: true },
+        where: { id: parseInt(id) },
       });
       if (!holderTable) throw new NotFoundError("Id Table  không tồn tại");
       return [holderTable]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
@@ -40,7 +40,7 @@ module.exports = {
 
     return table;
   },
-  createTablesService: async (table) => {
+  createTablesService: async (table, userId) => {
     //check tạo bởi ai
     await validateCreatedBy(table.created_by);
 
@@ -51,14 +51,13 @@ module.exports = {
       data: {
         floor_id: table.floor_id,
         table_numbers: table.table_numbers,
-        created_by: table.created_by,
+        created_by: userId,
         status: table.status,
       },
     });
     return newTable;
   },
-  putTableService: async (TableData) => {
-    await validatedUpdatedBy(TableData.updated_by);
+  putTableService: async (TableData, userId) => {
     //
     await validateRefFloor(TableData.floor_id);
 
@@ -75,8 +74,35 @@ module.exports = {
         name: TableData.name,
         floor_id: TableData.floor_id,
         table_numbers: TableData.table_numbers,
-        updated_by: TableData.updated_by,
+        updated_by: userId,
         status: TableData.status,
+      },
+    });
+    return updateTable;
+  },
+  deleteTableService: async (id, userId) => {
+    //parseString to Int ID
+    const Id = parseInt(id);
+
+    //check TableId isExist
+    await validateRefTable(Id);
+    //
+    const Table = await prisma.tables.findUnique({
+      where: {
+        id: Id,
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    const updateTable = await prisma.tables.update({
+      where: {
+        id: Id,
+      },
+      data: {
+        updated_by: userId,
+        status: !Table.status,
       },
     });
     return updateTable;

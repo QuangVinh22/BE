@@ -6,6 +6,7 @@ const {
   postPaymentMethodController,
   getPaymentMethodController,
   putPaymentMethodController,
+  deletePaymentMethodController,
 } = require("../controllers/payment_method_controller");
 const {
   validatePaymentMethodPost,
@@ -35,10 +36,11 @@ PaymentMethodRoutes.put(
   validatePaymentMethodPut,
   asyncHandler(putPaymentMethodController)
 );
-// PaymentMethodRoutes.delete(
-//   "/delete",
-//   verifyAccessToken,
-//   asyncHandler(deletePaymentMethodController)
-// );
+PaymentMethodRoutes.delete(
+  "/delete/:id",
+  verifyAccessToken,
+  checkRolePermission("Delete"),
+  asyncHandler(deletePaymentMethodController)
+);
 
 module.exports = PaymentMethodRoutes;

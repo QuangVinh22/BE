@@ -18,7 +18,7 @@ module.exports = {
     if (id) {
       // Fetch PaymentMethod by ID
       const holderPaymentMethod = await prisma.payment_method.findUnique({
-        where: { id: parseInt(id), status: true },
+        where: { id: parseInt(id) },
       });
       if (!holderPaymentMethod)
         throw new BadRequestError("Id PaymentMethod  không tồn tại");
@@ -40,22 +40,21 @@ module.exports = {
 
     return PaymentMethod;
   },
-  createPaymentMethodsService: async (PaymentMethod) => {
+  createPaymentMethodsService: async (PaymentMethod, userId) => {
     //check createdby
-    await validateCreatedBy(PaymentMethod.created_by);
     const newPaymentMethod = await prisma.payment_method.create({
       data: {
         name: PaymentMethod.name,
         description: PaymentMethod.description,
-        created_by: PaymentMethod.created_by,
+        created_by: userId,
         status: PaymentMethod.status,
       },
     });
     return newPaymentMethod;
   },
-  putPaymentMethodService: async (PaymentMethodData) => {
+  putPaymentMethodService: async (PaymentMethodData, userId) => {
     //check Updated isExist
-    await validatedUpdatedBy(PaymentMethodData.updated_by);
+
     //check paymentmethod isexist
     await validateRefPaymentMethod(PaymentMethodData.id);
     //
@@ -66,12 +65,40 @@ module.exports = {
       data: {
         name: PaymentMethodData.name,
         description: PaymentMethodData.description,
-        updated_by: PaymentMethodData.updated_by,
+        updated_by: userId,
         status: PaymentMethodData.status,
       },
     });
     return updatePaymentMethod;
   },
+  deletePaymentMethodService: async (id, userId) => {
+    //parseString to Int ID
+    const Id = parseInt(id);
+
+    //check PaymentMethodId isExist
+    await validateRefPaymentMethod(Id);
+    //
+    const PaymentMethod = await prisma.payment_method.findUnique({
+      where: {
+        id: Id,
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    const updatePaymentMethod = await prisma.payment_method.update({
+      where: {
+        id: Id,
+      },
+      data: {
+        updated_by: userId,
+        status: !PaymentMethod.status,
+      },
+    });
+    return updatePaymentMethod;
+  },
+
   //   deleteProductService: async (PaymentMethodData) => {
   //     const existingProduct = await prisma.PaymentMethods.findUnique({
   //       where: {

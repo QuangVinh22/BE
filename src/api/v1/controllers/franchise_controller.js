@@ -3,6 +3,7 @@ const {
   getFranchiseService,
   createFranchisesService,
   putFranchiseService,
+  deleteFranchiseService,
 } = require("../services/franchise_service.js");
 module.exports = {
   getFranchiseController: async (req, res, next) => {
@@ -12,21 +13,25 @@ module.exports = {
     }).send(res);
   },
   postFranchiseController: async (req, res, next) => {
+    const UserId = req.payload.userId;
     new CREATED({
       message: "Created  ",
-      metadata: await createFranchisesService(req.body),
+      metadata: await createFranchisesService(req.body, UserId),
     }).send(res);
   },
   putFranchiseController: async (req, res, next) => {
+    const UserId = req.payload.userId;
     new OK({
       message: " Franchises Updated: ",
-      metadata: await putFranchiseService(req.body),
+      metadata: await putFranchiseService(req.body, UserId),
     }).send(res);
   },
-  // deleteFranchiseController: async (req, res, next) => {
-  //   new OK({
-  //     message: " Franchises Deleted: ",
-  //     metadata: await deleteFranchiseService(req.body),
-  //   }).send(res);
-  // },
+  deleteFranchiseController: async (req, res, next) => {
+    const UserId = req.payload.userId;
+    const id = req.params.id;
+    new OK({
+      message: " Franchises Deleted: ",
+      metadata: await deleteFranchiseService(id, UserId),
+    }).send(res);
+  },
 };

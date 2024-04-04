@@ -17,7 +17,7 @@ module.exports = {
     if (id) {
       // Fetch Role by ID
       const holderRole = await prisma.role.findUnique({
-        where: { id: parseInt(id), status: true },
+        where: { id: parseInt(id) },
       });
       if (!holderRole) throw new NotFoundError("Id Role  không tồn tại");
       return [holderRole]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
@@ -38,14 +38,14 @@ module.exports = {
 
     return Role;
   },
-  createRolesService: async (Role) => {
+  createRolesService: async (Role, userId) => {
     //check coi Role này được tạo bởi user nào
-    await validateCreatedBy(Role.created_by);
+
     const newRole = await prisma.role.create({
       data: {
         name: Role.name,
         description: Role.description,
-        created_by: Role.created_by,
+        created_by: userId,
         status: Role.status,
       },
     });
@@ -64,8 +64,35 @@ module.exports = {
         name: RoleData.name,
         description: RoleData.description,
 
-        updated_by: RoleData.updated_by,
+        updated_by: userId,
         status: RoleData.status,
+      },
+    });
+    return updateRole;
+  },
+  deleteRoleService: async (id, userId) => {
+    //parseString to Int ID
+    const Id = parseInt(id);
+
+    //check RoleId isExist
+    await validateRefRole(Id);
+    //
+    const Role = await prisma.role.findUnique({
+      where: {
+        id: Id,
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    const updateRole = await prisma.role.update({
+      where: {
+        id: Id,
+      },
+      data: {
+        updated_by: userId,
+        status: !Role.status,
       },
     });
     return updateRole;

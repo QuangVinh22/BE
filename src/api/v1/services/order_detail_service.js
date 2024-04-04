@@ -20,7 +20,7 @@ module.exports = {
     if (id) {
       // Fetch OrderDetail by ID
       const holderOrderDetail = await prisma.orders_detail.findUnique({
-        where: { id: parseInt(id), status: true },
+        where: { id: parseInt(id) },
       });
       if (!holderOrderDetail)
         throw new BadRequestError("Id OrderDetail  không tồn tại");
@@ -42,13 +42,13 @@ module.exports = {
 
     return OrderDetail;
   },
-  createOrderDetailsService: async (OrderDetail) => {
+  createOrderDetailsService: async (OrderDetail, userId) => {
     //validate OrderId isExist
     await validateRefOrder(OrderDetail.order_id);
     //validate ProductId isExist
     await validateRefProduct(OrderDetail.product_id);
     //validate User Createdby isExist
-    await validateCreatedBy(OrderDetail.created_by);
+
     //
 
     const totalPrice = OrderDetail.price_per_unit * OrderDetail.quantity;
@@ -67,19 +67,18 @@ module.exports = {
         cost: cost,
         discount: OrderDetail.discount,
         total_after_discount: totalAfterDiscount,
-        created_by: OrderDetail.created_by,
+        created_by: userId,
         status: OrderDetail.status,
       },
     });
     return newOrderDetail;
   },
-  putOrderDetailService: async (OrderDetailData) => {
+  putOrderDetailService: async (OrderDetailData, userId) => {
     //validate OrderId isExist
     await validateRefOrder(OrderDetailData.order_id);
     //validate ProductId isExist
     await validateRefProduct(OrderDetailData.product_id);
     //validate UpdatedBy isExist
-    await validatedUpdatedBy(OrderDetailData.updated_by);
     //
     await validateRefOrderDetails(OrderDetailData.id);
     const totalPrice =
@@ -105,12 +104,39 @@ module.exports = {
         cost: cost,
         discount: OrderDetailData.discount,
         total_after_discount: totalAfterDiscount,
-        updated_by: OrderDetailData.updated_by,
+        updated_by: userId,
         status: OrderDetailData.status,
       },
     });
 
     return updateOrderDetail;
+  },
+  deleteOrDetailsService: async (id, userId) => {
+    //parseString to Int ID
+    const Id = parseInt(id);
+
+    //check OrDetailsId isExist
+    await validateRefOrderDetails(Id);
+    //
+    const OrDetails = await prisma.orders_detail.findUnique({
+      where: {
+        id: Id,
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    const updateOrDetails = await prisma.orders_detail.update({
+      where: {
+        id: Id,
+      },
+      data: {
+        updated_by: userId,
+        status: !OrDetails.status,
+      },
+    });
+    return updateOrDetails;
   },
   //   deleteProductService: async (OrderDetailData) => {
   //     const existingProduct = await prisma.OrderDetails.findUnique({

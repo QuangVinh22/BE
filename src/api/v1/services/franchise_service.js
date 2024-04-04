@@ -6,10 +6,10 @@ const {
   NotFoundError,
 } = require("../../core/error.response");
 const {
-  validateCreatedBy,
   validateRefFloor,
   validateRefFranchise,
-  validatedUpdatedBy,
+
+  validatedUserId,
 } = require("../../middleware/validate/validateReferencer");
 module.exports = {
   getFranchiseService: async (queryParams) => {
@@ -19,7 +19,7 @@ module.exports = {
     if (id) {
       // Fetch Franchise by ID
       const holderFranchise = await prisma.franchise.findUnique({
-        where: { id: parseInt(id), status: true },
+        where: { id: parseInt(id) },
       });
       if (!holderFranchise)
         throw new NotFoundError("Id Franchise  không tồn tại");
@@ -41,11 +41,9 @@ module.exports = {
 
     return Franchise;
   },
-  createFranchisesService: async (Franchise) => {
-    //check coi Franchise này được tạo bởi user nào
-    await validateCreatedBy(Franchise.created_by);
-    //Check quản lý của chi nhánh này
-    await validateCreatedBy(Franchise.user_id);
+  createFranchisesService: async (Franchise, userId) => {
+    //Validate quản lý chi nhánh này có hợp lệ k
+    await validatedUserId(Franchise.user_id);
     //check floor Tham chieu co dung k
     await validateRefFloor(Franchise.floor_id);
     //
@@ -57,13 +55,13 @@ module.exports = {
         name: Franchise.name,
         address: Franchise.address,
         phone_number: Franchise.phone_number,
-        created_by: Franchise.created_by,
+        created_by: userId,
         status: Franchise.status,
       },
     });
     return newFranchise;
   },
-  putFranchiseService: async (FranchiseData) => {
+  putFranchiseService: async (FranchiseData, userId) => {
     //check FranchiseId isExist
     await validateRefFranchise(FranchiseData.id);
 
@@ -78,7 +76,6 @@ module.exports = {
       throw new NotFoundError("Ko tìm thấy Id quản lý của chi nhánh cần sửa ");
     }
     //check cap nhat boi ai
-    await validatedUpdatedBy(FranchiseData.updated_by);
     //Update
     const updateFranchise = await prisma.franchise.update({
       where: {
@@ -90,8 +87,36 @@ module.exports = {
         name: FranchiseData.name,
         address: FranchiseData.address,
         phone_number: FranchiseData.phone_number,
-        updated_by: FranchiseData.updated_by,
+        updated_by: userId,
         status: FranchiseData.status,
+      },
+    });
+    return updateFranchise;
+  },
+  //soft deleted
+  deleteFranchiseService: async (id, userId) => {
+    //parseString to Int ID
+    const Id = parseInt(id);
+
+    //check FranchiseId isExist
+    await validateRefFranchise(Id);
+    //
+    const Franchise = await prisma.franchise.findUnique({
+      where: {
+        id: Id,
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    const updateFranchise = await prisma.franchise.update({
+      where: {
+        id: Id,
+      },
+      data: {
+        updated_by: userId,
+        status: !Franchise.status,
       },
     });
     return updateFranchise;

@@ -6,6 +6,7 @@ const {
   postTableController,
   getTableController,
   putTableController,
+  deleteTableController,
 } = require("../controllers/table_controller");
 const {
   validateTablesPost,
@@ -34,10 +35,11 @@ TableRoutes.put(
   validateTablesPut,
   asyncHandler(putTableController)
 );
-// TableRoutes.delete(
-//   "/delete",
-//   verifyAccessToken,
-//   asyncHandler(deleteTableController)
-// );
+TableRoutes.delete(
+  "/delete/:id",
+  verifyAccessToken,
+  checkRolePermission("Delete"),
+  asyncHandler(deleteTableController)
+);
 
 module.exports = TableRoutes;

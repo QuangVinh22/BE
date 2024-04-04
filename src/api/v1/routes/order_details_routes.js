@@ -6,6 +6,7 @@ const {
   postOrderDetailController,
   getOrderDetailController,
   putOrderDetailController,
+  deleteOrderDetailController,
 } = require("../controllers/order_detail_controller");
 const {
   validateOrdersDetailPost,
@@ -35,10 +36,11 @@ OrderDetailRoutes.put(
   checkRolePermission("Update"),
   asyncHandler(putOrderDetailController)
 );
-// OrderDetailRoutes.delete(
-//   "/delete",
-//   verifyAccessToken,
-//   asyncHandler(deleteOrderDetailController)
-// );
+OrderDetailRoutes.delete(
+  "/delete/:id",
+  verifyAccessToken,
+  checkRolePermission("Delete"),
+  asyncHandler(deleteOrderDetailController)
+);
 
 module.exports = OrderDetailRoutes;
