@@ -285,3 +285,12 @@ model tables {
   floors                         floors?   @relation(fields: [floor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tables_floor")
   users_tables_updated_byTousers users?    @relation("tables_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tables_updated_by")
 }
+model customers{
+  id Int @id @default(autoincrement())
+  name String
+  contactNumber String 
+  updated_time                   DateTime? @db.Timestamp(6) @updatedAt
+  created_time                   DateTime @db.Timestamp(6) @default(now())
+  status Boolean
+
+}

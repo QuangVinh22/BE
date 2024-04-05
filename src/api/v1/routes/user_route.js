@@ -12,6 +12,9 @@ const {
 //
 const { verifyAccessToken } = require("../services/jwt_service");
 const { checkRolePermission } = require("../../middleware/role_middleware");
+const {
+  checkMenuRolePermission,
+} = require("../../middleware/menu_role/menu_role_middleware");
 UserRoutes.get(
   "/get",
   verifyAccessToken,
@@ -28,6 +31,7 @@ UserRoutes.delete(
   "/delete/:id",
   verifyAccessToken,
   checkRolePermission("Delete"),
+  checkMenuRolePermission(),
   asyncHandler(deleteUserController)
 );
 

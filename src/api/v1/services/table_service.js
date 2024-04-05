@@ -42,7 +42,6 @@ module.exports = {
   },
   createTablesService: async (table, userId) => {
     //check tạo bởi ai
-    await validateCreatedBy(table.created_by);
 
     //check Floor tham chiếu
     await validateRefFloor(table.floor_id);
