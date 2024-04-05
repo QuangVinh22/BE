@@ -17,6 +17,9 @@ module.exports = {
   validateRefFloor: async (id) => {
     const isExistFloor = await prisma.floors.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+      },
     });
     if (!isExistFloor) {
       throw new NotFoundError("Id Floor không tồn tại ");
@@ -25,6 +28,9 @@ module.exports = {
   validateRefTable: async (id) => {
     const isExistFloor = await prisma.tables.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+      },
     });
     if (!isExistFloor) {
       throw new NotFoundError("Id Table không tồn tại ");
@@ -33,6 +39,9 @@ module.exports = {
   validateRefFranchise: async (id) => {
     const isExistFloor = await prisma.franchise.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+      },
     });
     if (!isExistFloor) {
       throw new NotFoundError("Id Chi Nhánh không tồn tại ");
@@ -41,6 +50,9 @@ module.exports = {
   validateRefCatalogue: async (id) => {
     const isExistCatalogue = await prisma.catalogue.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+      },
     });
     if (!isExistCatalogue) {
       throw new NotFoundError("Id Catalogue không tồn tại ");
@@ -49,6 +61,9 @@ module.exports = {
   validateRefProduct: async (id) => {
     const isExistProduct = await prisma.products.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+      },
     });
     if (!isExistProduct) {
       throw new NotFoundError("Id Sản Phẩm  không tồn tại ");
@@ -57,6 +72,9 @@ module.exports = {
   validateRefMenuProduct: async (id) => {
     const isExistMenuProduct = await prisma.menu_products.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+      },
     });
     if (!isExistMenuProduct) {
       throw new NotFoundError("Id Menu Product không tồn tại ");
@@ -65,6 +83,9 @@ module.exports = {
   validateRefRole: async (id) => {
     const isExistFloor = await prisma.role.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+      },
     });
     if (!isExistFloor) {
       throw new NotFoundError("Id Floor không tồn tại ");
@@ -73,6 +94,9 @@ module.exports = {
   validateRefRolePermission: async (id) => {
     const isExistFloor = await prisma.role_permissions.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+      },
     });
     if (!isExistFloor) {
       throw new NotFoundError("Id Role Permission không tồn tại ");
@@ -82,6 +106,9 @@ module.exports = {
   validateRefPaymentMethod: async (id) => {
     const isExistFloor = await prisma.payment_method.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+      },
     });
     if (!isExistFloor) {
       throw new NotFoundError("Payment method ID không tồn tại ");
@@ -91,6 +118,9 @@ module.exports = {
   validateRefOrder: async (id) => {
     const isExistFloor = await prisma.orders.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+      },
     });
     if (!isExistFloor) {
       throw new NotFoundError("Order ID không tồn tại ");
@@ -100,6 +130,9 @@ module.exports = {
   validateRefMenuRole: async (id) => {
     const isExistFloor = await prisma.menu_role.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+      },
     });
     if (!isExistFloor) {
       throw new NotFoundError("MenuRole ID không tồn tại ");
@@ -109,6 +142,9 @@ module.exports = {
   validateRefOrderDetails: async (id) => {
     const isExistFloor = await prisma.orders_detail.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+      },
     });
     if (!isExistFloor) {
       throw new NotFoundError("OrderDetails ID không tồn tại ");
@@ -118,6 +154,9 @@ module.exports = {
   validateRefQRRole: async (id) => {
     const isExistFloor = await prisma.qr_role.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+      },
     });
     if (!isExistFloor) {
       throw new NotFoundError("QRRole ID không tồn tại ");
@@ -127,6 +166,9 @@ module.exports = {
   validateRefQR: async (id) => {
     const isExistFloor = await prisma.qr.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+      },
     });
     if (!isExistFloor) {
       throw new NotFoundError("QR ID không tồn tại ");
