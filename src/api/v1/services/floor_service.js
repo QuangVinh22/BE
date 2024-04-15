@@ -8,38 +8,36 @@ const {
 const {
   validateRefFloor,
   validateRefFranchise,
-  validatedUpdatedBy,
-  validateCreatedBy,
 } = require("../../middleware/validate/validateReferencer");
+const { buildWhereClause } = require("../../utils/searchUtils");
+const { format } = require("date-fns");
 module.exports = {
   getFloorService: async (queryParams) => {
-    const { id, page, limit } = queryParams;
-
-    // Kiểm tra xem có truyền ID cụ thể không
-    if (id) {
-      // Fetch Floor by ID
-      const holderFloor = await prisma.floors.findUnique({
-        where: { id: parseInt(id) },
-      });
-      if (!holderFloor) throw new BadRequestError("Id Floor  không tồn tại");
-      return [holderFloor]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
-    }
+    const { filterField, operator, value, page, limit } = queryParams;
 
     // Fetch all with pagination
     const pageNum = parseInt(page) || 1; // Mặc định là trang 1 nếu không được cung cấp
     const pageSize = parseInt(limit) || 10; // Mặc định 10 sản phẩm mỗi trang nếu không được cung cấp
     const skip = (pageNum - 1) * pageSize;
+    const where = await buildWhereClause({ filterField, operator, value });
 
-    const Floor = await prisma.floors.findMany({
+    let Floors = await prisma.floors.findMany({
       skip: skip,
       take: pageSize,
-      where: {
-        status: true,
-      },
+      where,
     });
-
-    return Floor;
+    Floors = Floors.map((floor) => ({
+      ...floor,
+      created_time: format(new Date(floor.created_time), "MM-dd-yyyy "),
+      updated_time: format(new Date(floor.updated_time), "MM-dd-yyyy "),
+    }));
+    //
+    if (Floors.length === 0) {
+      return [];
+    }
+    return Floors;
   },
+
   createFloorsService: async (Floor, UserId) => {
     //check coi Floor này được tạo bởi user nào
     //Check id chi nhánh muốn thêm có tồn tại k
@@ -71,7 +69,6 @@ module.exports = {
         floor_name: FloorData.floor_name,
         description: FloorData.description,
         updated_by: UserId,
-        status: FloorData.status,
       },
     });
     return updateFloor;

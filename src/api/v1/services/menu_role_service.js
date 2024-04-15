@@ -5,36 +5,34 @@ const {
   validatedUpdatedBy,
   validateRefMenuRole,
 } = require("../../middleware/validate/validateReferencer");
+const { buildWhereClause } = require("../../utils/searchUtils");
+const { format } = require("date-fns");
 const prisma = new PrismaClient();
 module.exports = {
   getMenuRoleService: async (queryParams) => {
-    const { id, page, limit } = queryParams;
-
-    // Kiểm tra xem có truyền ID cụ thể không
-    if (id) {
-      // Fetch MenuRole by ID
-      const holderMenuRole = await prisma.menu_role.findUnique({
-        where: { id: parseInt(id) },
-      });
-      if (!holderMenuRole)
-        throw new BadRequestError("Id MenuRole  không tồn tại");
-      return [holderMenuRole]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
-    }
+    const { filterField, operator, value, page, limit } = queryParams;
 
     // Fetch all with pagination
     const pageNum = parseInt(page) || 1; // Mặc định là trang 1 nếu không được cung cấp
     const pageSize = parseInt(limit) || 10; // Mặc định 10 sản phẩm mỗi trang nếu không được cung cấp
     const skip = (pageNum - 1) * pageSize;
+    const where = await buildWhereClause({ filterField, operator, value });
 
-    const MenuRole = await prisma.menu_role.findMany({
+    let Menu_Role = await prisma.menu_role.findMany({
       skip: skip,
       take: pageSize,
-      where: {
-        status: true,
-      },
+      where,
     });
-
-    return MenuRole;
+    Menu_Role = Menu_Role.map((menu_role) => ({
+      ...menu_role,
+      created_time: format(new Date(menu_role.created_time), "MM-dd-yyyy "),
+      updated_time: format(new Date(menu_role.updated_time), "MM-dd-yyyy "),
+    }));
+    //
+    if (Menu_Role.length === 0) {
+      return [];
+    }
+    return Menu_Role;
   },
   createMenuRolesService: async (MenuRole, userId) => {
     //check coi MenuRole này được tạo bởi user có tồn tại k
@@ -66,7 +64,6 @@ module.exports = {
         function_url: MenuRoleData.function_url,
         function_name: MenuRoleData.function_name,
         updated_by: userId,
-        status: MenuRoleData.status,
       },
     });
     return updateMenuRole;

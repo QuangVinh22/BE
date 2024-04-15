@@ -87,7 +87,6 @@ module.exports = {
         role_id: RolePermissionData.role_id,
         name: RolePermissionData.name,
         updated_by: userId,
-        status: RolePermissionData.status,
       },
     });
     return updateRolePermission;

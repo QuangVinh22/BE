@@ -1,46 +1,43 @@
 const { PrismaClient } = require("@prisma/client");
+const { format } = require("date-fns");
 const prisma = new PrismaClient();
 const {
   BadRequestError,
   ConflictRequestError,
   NotFoundError,
 } = require("../../core/error.response");
+const aqp = require("api-query-params");
 const {
-  validateCreatedBy,
-  validateRefFloor,
-  validatedUpdatedBy,
   validateRefFranchise,
   validatedUserId,
-  validateRefRole,
 } = require("../../middleware/validate/validateReferencer");
+const { OK } = require("../../core/success.response");
+const { buildWhereClause } = require("../../utils/searchUtils");
+
 module.exports = {
   getUsersService: async (queryParams) => {
-    const { id, page, limit } = queryParams;
-
-    // Kiểm tra xem có truyền ID cụ thể không
-    if (id) {
-      // Fetch Users by ID
-      const holderUsers = await prisma.users.findUnique({
-        where: { id: parseInt(id) },
-      });
-      if (!holderUsers) throw new NotFoundError("Id User  không tồn tại");
-      return [holderUsers];
-    }
+    const { filterField, operator, value, page, limit } = queryParams;
 
     // Fetch all with pagination
     const pageNum = parseInt(page) || 1; // Mặc định là trang 1 nếu không được cung cấp
     const pageSize = parseInt(limit) || 10; // Mặc định 10 sản phẩm mỗi trang nếu không được cung cấp
     const skip = (pageNum - 1) * pageSize;
-
-    const user = await prisma.users.findMany({
-      skip: skip,
+    const where = await buildWhereClause({ filterField, operator, value });
+    let users = await prisma.users.findMany({
+      skip,
       take: pageSize,
-      where: {
-        status: true,
-      },
+      where,
     });
-
-    return user;
+    users = users.map((user) => ({
+      ...user,
+      created_time: format(new Date(user.created_time), "MM-dd-yyyy "),
+      updated_time: format(new Date(user.updated_time), "MM-dd-yyyy "),
+    }));
+    //
+    if (users.length === 0) {
+      return [];
+    }
+    return users;
   },
 
   putUsersService: async (UserData) => {

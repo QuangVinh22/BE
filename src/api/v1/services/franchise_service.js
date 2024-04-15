@@ -11,35 +11,33 @@ const {
 
   validatedUserId,
 } = require("../../middleware/validate/validateReferencer");
+const { buildWhereClause } = require("../../utils/searchUtils");
+const { format } = require("date-fns");
 module.exports = {
   getFranchiseService: async (queryParams) => {
-    const { id, page, limit } = queryParams;
-
-    // Kiểm tra xem có truyền ID cụ thể không
-    if (id) {
-      // Fetch Franchise by ID
-      const holderFranchise = await prisma.franchise.findUnique({
-        where: { id: parseInt(id) },
-      });
-      if (!holderFranchise)
-        throw new NotFoundError("Id Franchise  không tồn tại");
-      return [holderFranchise]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
-    }
+    const { filterField, operator, value, page, limit } = queryParams;
 
     // Fetch all with pagination
     const pageNum = parseInt(page) || 1; // Mặc định là trang 1 nếu không được cung cấp
     const pageSize = parseInt(limit) || 10; // Mặc định 10 sản phẩm mỗi trang nếu không được cung cấp
     const skip = (pageNum - 1) * pageSize;
+    const where = await buildWhereClause({ filterField, operator, value });
 
-    const Franchise = await prisma.franchise.findMany({
+    let Franchises = await prisma.franchise.findMany({
       skip: skip,
       take: pageSize,
-      where: {
-        status: true,
-      },
+      where,
     });
-
-    return Franchise;
+    Franchises = Franchises.map((franchise) => ({
+      ...franchise,
+      created_time: format(new Date(franchise.created_time), "MM-dd-yyyy "),
+      updated_time: format(new Date(franchise.updated_time), "MM-dd-yyyy "),
+    }));
+    //
+    if (Franchises.length === 0) {
+      return [];
+    }
+    return Franchises;
   },
   createFranchisesService: async (Franchise, userId) => {
     //Validate quản lý chi nhánh này có hợp lệ k
@@ -88,7 +86,6 @@ module.exports = {
         address: FranchiseData.address,
         phone_number: FranchiseData.phone_number,
         updated_by: userId,
-        status: FranchiseData.status,
       },
     });
     return updateFranchise;

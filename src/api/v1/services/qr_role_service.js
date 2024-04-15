@@ -80,7 +80,6 @@ module.exports = {
         max_qr_codes: QRRoleData.max_qr_codes,
         role_id: QRRoleData.role_id,
         updated_by: userId,
-        status: QRRoleData.status,
       },
     });
     return updateQRRole;

@@ -6,8 +6,6 @@ const {
   NotFoundError,
 } = require("../../core/error.response");
 const {
-  validateCreatedBy,
-  validatedUpdatedBy,
   validateRefPaymentMethod,
 } = require("../../middleware/validate/validateReferencer");
 module.exports = {
@@ -66,7 +64,6 @@ module.exports = {
         name: PaymentMethodData.name,
         description: PaymentMethodData.description,
         updated_by: userId,
-        status: PaymentMethodData.status,
       },
     });
     return updatePaymentMethod;

@@ -12,32 +12,33 @@ const {
   validatedUpdatedBy,
   validateRefMenuProduct,
 } = require("../../middleware/validate/validateReferencer");
+const { buildWhereClause } = require("../../utils/searchUtils");
+const { format } = require("date-fns");
 module.exports = {
   getMenuProductsService: async (queryParams) => {
-    const { id, page, limit } = queryParams;
-
-    // Kiểm tra xem có truyền ID cụ thể không
-    if (id) {
-      // Fetch product by ID
-      const menuProduct = await prisma.menu_products.findUnique({
-        where: { id: parseInt(id) },
-      });
-      if (!menuProduct)
-        throw new NotFoundError("Id Menu Product doest not exist");
-      return [menuProduct]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
-    }
+    const { filterField, operator, value, page, limit } = queryParams;
 
     // Fetch all with pagination
     const pageNum = parseInt(page) || 1; // Mặc định là trang 1 nếu không được cung cấp
     const pageSize = parseInt(limit) || 10; // Mặc định 10 sản phẩm mỗi trang nếu không được cung cấp
     const skip = (pageNum - 1) * pageSize;
+    const where = await buildWhereClause({ filterField, operator, value });
 
-    const menuProducts = await prisma.menu_products.findMany({
+    let Menu_Products = await prisma.menu_products.findMany({
       skip: skip,
       take: pageSize,
+      where,
     });
-
-    return menuProducts;
+    Menu_Products = Menu_Products.map((menu_product) => ({
+      ...menu_product,
+      created_time: format(new Date(menu_product.created_time), "MM-dd-yyyy "),
+      updated_time: format(new Date(menu_product.updated_time), "MM-dd-yyyy "),
+    }));
+    //
+    if (Menu_Products.length === 0) {
+      return [];
+    }
+    return Menu_Products;
   },
   createMenuProductsService: async (MenuProduct, userId) => {
     //Check Product tham chiếu trong bảng product có tồn tại k
@@ -75,7 +76,6 @@ module.exports = {
         product_id: MenuProductData.product_id,
         catalogue_id: MenuProductData.catalogue_id,
         updated_by: userId,
-        status: MenuProductData.status,
       },
     });
     return updatedProduct;

@@ -8,39 +8,35 @@ const {
 const {
   validateRefOrder,
   validateRefProduct,
-  validateCreatedBy,
-  validatedUpdatedBy,
   validateRefOrderDetails,
 } = require("../../middleware/validate/validateReferencer");
+const { buildWhereClause } = require("../../utils/searchUtils");
+const { format } = require("date-fns");
 module.exports = {
   getOrderDetailService: async (queryParams) => {
-    const { id, page, limit } = queryParams;
-
-    // Kiểm tra xem có truyền ID cụ thể không
-    if (id) {
-      // Fetch OrderDetail by ID
-      const holderOrderDetail = await prisma.orders_detail.findUnique({
-        where: { id: parseInt(id) },
-      });
-      if (!holderOrderDetail)
-        throw new BadRequestError("Id OrderDetail  không tồn tại");
-      return [holderOrderDetail]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
-    }
+    const { filterField, operator, value, page, limit } = queryParams;
 
     // Fetch all with pagination
     const pageNum = parseInt(page) || 1; // Mặc định là trang 1 nếu không được cung cấp
     const pageSize = parseInt(limit) || 10; // Mặc định 10 sản phẩm mỗi trang nếu không được cung cấp
     const skip = (pageNum - 1) * pageSize;
+    const where = await buildWhereClause({ filterField, operator, value });
 
-    const OrderDetail = await prisma.orders_detail.findMany({
+    let Order_Detail = await prisma.orders_detail.findMany({
       skip: skip,
       take: pageSize,
-      where: {
-        status: true,
-      },
+      where,
     });
-
-    return OrderDetail;
+    Order_Detail = Order_Detail.map((o_d) => ({
+      ...o_d,
+      created_time: format(new Date(o_d.created_time), "MM-dd-yyyy "),
+      updated_time: format(new Date(o_d.updated_time), "MM-dd-yyyy "),
+    }));
+    //
+    if (Order_Detail.length === 0) {
+      return [];
+    }
+    return Order_Detail;
   },
   createOrderDetailsService: async (OrderDetail, userId) => {
     //validate OrderId isExist
@@ -105,7 +101,6 @@ module.exports = {
         discount: OrderDetailData.discount,
         total_after_discount: totalAfterDiscount,
         updated_by: userId,
-        status: OrderDetailData.status,
       },
     });
 

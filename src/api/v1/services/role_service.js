@@ -6,7 +6,6 @@ const {
   ConflictRequestError,
 } = require("../../core/error.response");
 const {
-  validatedUpdatedBy,
   validateRefRole,
 } = require("../../middleware/validate/validateReferencer");
 module.exports = {
@@ -51,7 +50,7 @@ module.exports = {
     });
     return newRole;
   },
-  putRoleService: async (RoleData) => {
+  putRoleService: async (RoleData, userId) => {
     //check user update có tồn tài k mới cho sửa
     await validatedUpdatedBy(RoleData.updated_by);
     //check Idrole isexist
@@ -65,7 +64,6 @@ module.exports = {
         description: RoleData.description,
 
         updated_by: userId,
-        status: RoleData.status,
       },
     });
     return updateRole;

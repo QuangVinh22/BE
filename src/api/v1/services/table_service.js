@@ -6,39 +6,37 @@ const {
   NotFoundError,
 } = require("../../core/error.response");
 const {
-  validateCreatedBy,
   validateRefFloor,
-  validatedUpdatedBy,
+
   validateRefTable,
 } = require("../../middleware/validate/validateReferencer");
+const { buildWhereClause } = require("../../utils/searchUtils");
+const { format } = require("date-fns");
 module.exports = {
   getTableService: async (queryParams) => {
-    const { id, page, limit } = queryParams;
-
-    // Kiểm tra xem có truyền ID cụ thể không
-    if (id) {
-      // Fetch table by ID
-      const holderTable = await prisma.tables.findUnique({
-        where: { id: parseInt(id) },
-      });
-      if (!holderTable) throw new NotFoundError("Id Table  không tồn tại");
-      return [holderTable]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
-    }
+    const { filterField, operator, value, page, limit } = queryParams;
 
     // Fetch all with pagination
     const pageNum = parseInt(page) || 1; // Mặc định là trang 1 nếu không được cung cấp
     const pageSize = parseInt(limit) || 10; // Mặc định 10 sản phẩm mỗi trang nếu không được cung cấp
     const skip = (pageNum - 1) * pageSize;
+    const where = await buildWhereClause({ filterField, operator, value });
 
-    const table = await prisma.tables.findMany({
+    let Table = await prisma.tables.findMany({
       skip: skip,
       take: pageSize,
-      where: {
-        status: true,
-      },
+      where,
     });
-
-    return table;
+    Table = Table.map((table) => ({
+      ...table,
+      created_time: format(new Date(table.created_time), "MM-dd-yyyy "),
+      updated_time: format(new Date(table.updated_time), "MM-dd-yyyy "),
+    }));
+    //
+    if (Table.length === 0) {
+      return [];
+    }
+    return Table;
   },
   createTablesService: async (table, userId) => {
     //check tạo bởi ai
@@ -74,7 +72,6 @@ module.exports = {
         floor_id: TableData.floor_id,
         table_numbers: TableData.table_numbers,
         updated_by: userId,
-        status: TableData.status,
       },
     });
     return updateTable;

@@ -11,37 +11,33 @@ const {
   validateRefFloor,
   validateRefTable,
   validateRefPaymentMethod,
-  validatedUpdatedBy,
-  validateCreatedBy,
-  validateRefOrderDetails,
 } = require("../../middleware/validate/validateReferencer");
+const { buildWhereClause } = require("../../utils/searchUtils");
+const { format } = require("date-fns");
 module.exports = {
   getOrderService: async (queryParams) => {
-    const { id, page, limit } = queryParams;
-
-    // Kiểm tra xem có truyền ID cụ thể không
-    if (id) {
-      // Fetch Order by ID
-      const holderOrder = await prisma.orders.findUnique({
-        where: { id: parseInt(id) },
-      });
-      if (!holderOrder) throw new BadRequestError("Id Order  không tồn tại");
-      return [holderOrder]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
-    }
+    const { filterField, operator, value, page, limit } = queryParams;
 
     // Fetch all with pagination
     const pageNum = parseInt(page) || 1; // Mặc định là trang 1 nếu không được cung cấp
     const pageSize = parseInt(limit) || 10; // Mặc định 10 sản phẩm mỗi trang nếu không được cung cấp
     const skip = (pageNum - 1) * pageSize;
+    const where = await buildWhereClause({ filterField, operator, value });
 
-    const Order = await prisma.orders.findMany({
+    let Order = await prisma.orders.findMany({
       skip: skip,
       take: pageSize,
-      where: {
-        status: true,
-      },
+      where,
     });
-
+    Order = Order.map((order) => ({
+      ...order,
+      created_time: format(new Date(order.created_time), "MM-dd-yyyy "),
+      updated_time: format(new Date(order.updated_time), "MM-dd-yyyy "),
+    }));
+    //
+    if (Order.length === 0) {
+      return [];
+    }
     return Order;
   },
   createOrdersService: async (Order, userId) => {
@@ -109,7 +105,6 @@ module.exports = {
         discount: OrderData.discount,
         total_after_discount: totalAfterDiscount,
         updated_by: userId,
-        status: OrderData.status,
       },
     });
 

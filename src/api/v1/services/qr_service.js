@@ -81,7 +81,6 @@ module.exports = {
         order_id: QRData.order_id,
         table_id: QRData.table_id,
         updated_by: userId,
-        status: QRData.status,
       },
     });
     return updateQR;

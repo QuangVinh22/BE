@@ -6,37 +6,34 @@ const {
   NotFoundError,
 } = require("../../core/error.response");
 const {
-  validatedUpdatedBy,
   validateRefProduct,
-  validateCreatedBy,
 } = require("../../middleware/validate/validateReferencer");
+const { buildWhereClause } = require("../../utils/searchUtils");
+const { format } = require("date-fns");
 module.exports = {
   getProductsService: async (queryParams) => {
-    const { id, page, limit } = queryParams;
-
-    // Kiểm tra xem có truyền ID cụ thể không
-    if (id) {
-      // Fetch product by ID
-      const product = await prisma.products.findUnique({
-        where: { id: parseInt(id) },
-      });
-      if (!product) throw new NotFoundError("Id Product doest không tồn tại");
-      return [product]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
-    }
+    const { filterField, operator, value, page, limit } = queryParams;
 
     // Fetch all with pagination
     const pageNum = parseInt(page) || 1; // Mặc định là trang 1 nếu không được cung cấp
     const pageSize = parseInt(limit) || 10; // Mặc định 10 sản phẩm mỗi trang nếu không được cung cấp
     const skip = (pageNum - 1) * pageSize;
+    const where = await buildWhereClause({ filterField, operator, value });
 
-    const products = await prisma.products.findMany({
+    let products = await prisma.products.findMany({
       skip: skip,
       take: pageSize,
-      where: {
-        status: true,
-      },
+      where,
     });
-
+    products = products.map((product) => ({
+      ...product,
+      created_time: format(new Date(product.created_time), "MM-dd-yyyy "),
+      updated_time: format(new Date(product.updated_time), "MM-dd-yyyy "),
+    }));
+    //
+    if (products.length === 0) {
+      return [];
+    }
     return products;
   },
   createProductsService: async (product, userId) => {
@@ -57,7 +54,7 @@ module.exports = {
     });
     return newProduct;
   },
-  putProductService: async (ProductData) => {
+  putProductService: async (ProductData, userId) => {
     //check user update có tồn tài k mới cho sửa
 
     // Check coi product cần update có tồn tại k
@@ -78,8 +75,7 @@ module.exports = {
         price: ProductData.price,
         vat: ProductData.vat,
         cost: cost,
-        updated_by: ProductData.userId,
-        status: ProductData.status,
+        updated_by: userId,
       },
     });
     return updateProduct;

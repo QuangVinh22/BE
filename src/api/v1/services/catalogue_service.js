@@ -6,38 +6,35 @@ const {
   NotFoundError,
 } = require("../../core/error.response");
 const {
-  validateCreatedBy,
-  validatedUpdatedBy,
   validateRefCatalogue,
 } = require("../../middleware/validate/validateReferencer");
-const { parse } = require("path");
+const { buildWhereClause } = require("../../utils/searchUtils");
+const { format } = require("date-fns");
 module.exports = {
   getCatalogueService: async (queryParams) => {
-    const { id, page, limit } = queryParams;
-
-    // Kiểm tra xem có truyền ID cụ thể không
-    if (id) {
-      // Fetch Catalogue by ID
-      const holderCatalogue = await prisma.catalogue.findUnique({
-        where: { id: parseInt(id) },
-      });
-      if (!holderCatalogue)
-        throw new BadRequestError("Id Catalogue  không tồn tại");
-      return [holderCatalogue]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
-    }
+    const { filterField, operator, value, page, limit } = queryParams;
 
     // Fetch all with pagination
     const pageNum = parseInt(page) || 1; // Mặc định là trang 1 nếu không được cung cấp
     const pageSize = parseInt(limit) || 10; // Mặc định 10 sản phẩm mỗi trang nếu không được cung cấp
     const skip = (pageNum - 1) * pageSize;
+    const where = await buildWhereClause({ filterField, operator, value });
 
-    const Catalogue = await prisma.catalogue.findMany({
+    let catalogue = await prisma.catalogue.findMany({
       skip: skip,
       take: pageSize,
-      where: {},
+      where,
     });
-
-    return Catalogue;
+    catalogue = catalogue.map((cata) => ({
+      ...cata,
+      created_time: format(new Date(cata.created_time), "MM-dd-yyyy "),
+      updated_time: format(new Date(cata.updated_time), "MM-dd-yyyy "),
+    }));
+    //
+    if (catalogue.length === 0) {
+      return [];
+    }
+    return catalogue;
   },
   createCataloguesService: async (Catalogue, UserId) => {
     //check CreatedBy isExist
@@ -66,7 +63,6 @@ module.exports = {
         image: CatalogueData.image,
         name: CatalogueData.name,
         updated_by: UserId,
-        status: CatalogueData.status,
       },
     });
     return updateCatalogue;
@@ -97,7 +93,7 @@ module.exports = {
     });
     return updateCatalogue;
   },
-  //   deleteProductService: async (CatalogueData) => {
+  //   deletecatalogueervice: async (CatalogueData) => {
   //     const existingProduct = await prisma.Catalogues.findUnique({
   //       where: {
   //         id: CatalogueData.id,
