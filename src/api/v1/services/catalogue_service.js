@@ -53,11 +53,11 @@ module.exports = {
   putCatalogueService: async (CatalogueData, imagePath, UserId) => {
     //check UpdateBy isExist
     //check CatalogueId isExist
-    await validateRefCatalogue(CatalogueData.id);
+    await validateRefCatalogue(parseFloat(CatalogueData.id));
     //
     const updateCatalogue = await prisma.catalogue.update({
       where: {
-        id: CatalogueData.id,
+        id: parseFloat(CatalogueData.id),
       },
       data: {
         description: CatalogueData.description,
