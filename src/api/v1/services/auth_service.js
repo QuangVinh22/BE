@@ -9,6 +9,7 @@ const {
 const {
   SignAccessToken,
   signRefreshToken,
+  verifyRefreshToken,
 } = require("../services/jwt_service");
 module.exports = {
   RegisterUserService: async (test, userId) => {
@@ -61,5 +62,24 @@ module.exports = {
     const refreshToken = await signRefreshToken(foundUser.id);
 
     return { accessToken, refreshToken };
+  },
+  refreshTokenService: async (refreshToken) => {
+    if (!refreshToken) {
+      throw new BadRequestError("Refresh Token ko hợp lệ hoặc ko có");
+    }
+
+    const userData = await verifyRefreshToken(refreshToken);
+    const accessToken = await SignAccessToken(userData.id, userData.role_id);
+
+    // (Tùy chọn) Phát hành một refresh token mới và lưu trữ nó
+    // const newRefreshToken = await signRefreshToken(userData.userId);
+    // Lưu trữ vào Redis ở đây
+    if (!accessToken) {
+      throw new BadRequestError("");
+    }
+    return {
+      accessToken,
+      // Trả về refreshToken mới nếu cần
+    };
   },
 };

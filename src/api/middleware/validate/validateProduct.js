@@ -12,12 +12,7 @@ const productValidationSchema = Joi.object({
     "string.max": `"Description" must not exceed 50 characters.`,
     "any.required": `"Description" is a required field.`,
   }),
-  image: Joi.string()
-
-    .pattern(new RegExp("^(https?://)?([da-z.-]+).([a-z.]{2,6})([/w .-]*)*/?$"))
-    .messages({
-      "string.pattern.base": `"Image" must be a valid URL.`,
-    }),
+  image: Joi.string(),
   price: Joi.number().required().messages({
     "number.base": `"Price" must be a number.`,
     "any.required": `"Price" is a required field.`,

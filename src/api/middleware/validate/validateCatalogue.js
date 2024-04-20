@@ -23,7 +23,6 @@ const validateCataloguePutSchema = Joi.object({
     "string.base": `"Description" must be a string.`,
     "string.min": `"Description" must be at least 5 characters long.`,
     "string.max": `"Description" must not exceed 50 characters.`,
-    "any.required": `"Description" is a required field.`,
   }),
   image: Joi.string().uri().messages({
     "string.base": `"Image" must be a string.`,

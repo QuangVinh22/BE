@@ -5,6 +5,7 @@ const {
   putCatalogueService,
   deleteCatalogueService,
 } = require("../services/catalogue_service.js");
+const path = require("path");
 module.exports = {
   getCatalogueController: async (req, res, next) => {
     new OK({
@@ -13,17 +14,21 @@ module.exports = {
     }).send(res);
   },
   postCatalogueController: async (req, res, next) => {
+    const fullPath = req.file.path;
+    const fileName = path.basename(fullPath);
     const UserId = req.payload.userId;
     new CREATED({
       message: "Created  ",
-      metadata: await createCataloguesService(req.body, UserId),
+      metadata: await createCataloguesService(req.body, fileName, UserId),
     }).send(res);
   },
   putCatalogueController: async (req, res, next) => {
+    const fullPath = req.file.path;
+    const fileName = path.basename(fullPath);
     const UserId = req.payload.userId;
     new OK({
       message: " Catalogues Updated: ",
-      metadata: await putCatalogueService(req.body, UserId),
+      metadata: await putCatalogueService(req.body, fileName, UserId),
     }).send(res);
   },
   deleteCatalogueController: async (req, res, next) => {

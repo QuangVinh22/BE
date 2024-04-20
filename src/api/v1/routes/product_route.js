@@ -13,11 +13,14 @@ const {
 
 const { verifyAccessToken } = require("../services/jwt_service");
 const { checkRolePermission } = require("../../middleware/role_middleware");
+const { upload } = require("../../utils/imageUtils");
+
 ProductRoutes.post(
   "/post",
   verifyAccessToken,
+  upload.single("image"),
   checkRolePermission("Create"),
-  validateProduct,
+
   asyncHandler(postProductController)
 );
 ProductRoutes.get(
@@ -29,6 +32,7 @@ ProductRoutes.get(
 ProductRoutes.put(
   "/put",
   verifyAccessToken,
+  upload.single("image"),
   checkRolePermission("Update"),
   asyncHandler(putProductController)
 );

@@ -27,6 +27,7 @@ module.exports = {
     });
     catalogue = catalogue.map((cata) => ({
       ...cata,
+      image: cata.image ? `http://localhost:8080/images/${cata.image}` : null,
       created_time: format(new Date(cata.created_time), "MM-dd-yyyy "),
       updated_time: format(new Date(cata.updated_time), "MM-dd-yyyy "),
     }));
@@ -36,20 +37,20 @@ module.exports = {
     }
     return catalogue;
   },
-  createCataloguesService: async (Catalogue, UserId) => {
+  createCataloguesService: async (Catalogue, imagePath, UserId) => {
     //check CreatedBy isExist
-    //
+    //imagePath
     const newCatalogue = await prisma.catalogue.create({
       data: {
         description: Catalogue.description,
-        image: Catalogue.image,
+        image: imagePath,
         created_by: UserId,
-        status: Catalogue.status,
+        status: true,
       },
     });
     return newCatalogue;
   },
-  putCatalogueService: async (CatalogueData, UserId) => {
+  putCatalogueService: async (CatalogueData, imagePath, UserId) => {
     //check UpdateBy isExist
     //check CatalogueId isExist
     await validateRefCatalogue(CatalogueData.id);
@@ -60,7 +61,7 @@ module.exports = {
       },
       data: {
         description: CatalogueData.description,
-        image: CatalogueData.image,
+        image: imagePath,
         name: CatalogueData.name,
         updated_by: UserId,
       },

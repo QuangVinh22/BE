@@ -23,6 +23,8 @@ const QRRoleRoutes = require("./api/v1/routes/qr_role_route");
 const PaymentMethodRoutes = require("./api/v1/routes/payment_method_route");
 const UserRoutes = require("./api/v1/routes/user_route");
 const CustomerRoutes = require("./api/v1/routes/customer_route");
+//
+const path = require("path");
 const app = express();
 //CORS
 app.use(
@@ -56,6 +58,8 @@ app.use("/v1/payment_method", PaymentMethodRoutes);
 app.use("/v1/qr", QRRoutes);
 app.use("/v1/user", UserRoutes);
 app.use("/v1/customer", CustomerRoutes);
+app.use("/images", express.static(path.join(__dirname, "/api/utils/images")));
+
 
 //Redis
 const client = require("./helpers/connect_redis");

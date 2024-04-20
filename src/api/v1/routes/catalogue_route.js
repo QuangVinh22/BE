@@ -16,9 +16,11 @@ const {
   validateCataloguePut,
 } = require("../../middleware/validate/validateCatalogue");
 const { checkRolePermission } = require("../../middleware/role_middleware");
+const { upload } = require("../../utils/imageUtils");
 CatalogueRoutes.post(
   "/post",
   verifyAccessToken,
+  upload.single("image"),
   checkRolePermission("Create"),
   validateCataloguePost,
   asyncHandler(postCatalogueController)
@@ -32,6 +34,7 @@ CatalogueRoutes.get(
 CatalogueRoutes.put(
   "/put",
   verifyAccessToken,
+  upload.single("image"),
   checkRolePermission("Update"),
   validateCataloguePut,
   asyncHandler(putCatalogueController)
