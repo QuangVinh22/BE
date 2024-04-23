@@ -28,12 +28,37 @@ module.exports = {
       skip: skip,
       take: pageSize,
       where,
+      include: {
+        createdByUser: true, // Bao gồm thông tin người dùng đã tạo
+        updatedByUser: true,
+        franchise: true,
+        floors: true,
+        tables: true,
+        payment_method: true,
+      },
     });
-    Order = Order.map((order) => ({
-      ...order,
-      created_time: format(new Date(order.created_time), "MM-dd-yyyy "),
-      updated_time: format(new Date(order.updated_time), "MM-dd-yyyy "),
-    }));
+    Order = Order.map((order) => {
+      const formatOrder = {
+        ...order,
+        created_time: format(new Date(order.created_time), "MM-dd-yyyy "),
+        updated_time: format(new Date(order.updated_time), "MM-dd-yyyy "),
+        created_by: order.createdByUser.username,
+        updated_by: order.updatedByUser
+          ? order.updatedByUser.username
+          : "Not yet updated",
+        franchise_id: order.franchise.name,
+        floor_id: order.floors.floor_name,
+        table_id: "Bàn " + order.tables.table_numbers,
+        payment_method_id: order.payment_method.name,
+      };
+      delete formatOrder.createdByUser;
+      delete formatOrder.updatedByUser;
+      delete formatOrder.franchise;
+      delete formatOrder.floors;
+      delete formatOrder.tables;
+      delete formatOrder.payment_method;
+      return formatOrder;
+    });
     //
     if (Order.length === 0) {
       return [];

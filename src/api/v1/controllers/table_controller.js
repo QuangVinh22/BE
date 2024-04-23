@@ -4,12 +4,19 @@ const {
   getTableService,
   putTableService,
   deleteTableService,
+  getListTableServiceId,
 } = require("../services/table_service.js");
 module.exports = {
   getTableController: async (req, res, next) => {
     new OK({
       message: "List Tables: ",
       metadata: await getTableService(req.query),
+    }).send(res);
+  },
+  getListIdTableController: async (req, res, next) => {
+    new OK({
+      message: "List Tables: ",
+      metadata: await getListTableServiceId(req.query),
     }).send(res);
   },
   postTableController: async (req, res, next) => {

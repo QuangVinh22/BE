@@ -2,6 +2,11 @@ const { BadRequestError } = require("../../core/error.response"); // Giả sử 
 const Joi = require("joi");
 
 const MenuProductValidationSchema = Joi.object({
+  id: Joi.number().integer().required().messages({
+    "number.base": `"ID" must be a number.`,
+    "number.integer": `"ID" must be an integer.`,
+    "any.required": `"ID" is a required field.`,
+  }),
   name: Joi.string().max(50).required().messages({
     "string.base": `"Menu Product Name" must be a string.`,
     "string.max": `"Menu Product Name" must not exceed 50 characters.`,
@@ -14,7 +19,7 @@ const MenuProductValidationSchema = Joi.object({
   catalogue_id: Joi.number().integer().messages({
     "number.base": "CatalogueId  must be an integer",
   }),
-  status: Joi.boolean().required().messages({
+  status: Joi.boolean().messages({
     "boolean.base": `"Status" must be true or false.`,
     "any.required": `"Status" is a required field.`,
   }),
@@ -22,14 +27,14 @@ const MenuProductValidationSchema = Joi.object({
 
 // Usage example
 const validateMenuProductPost = (req, res, next) => {
-  const { error } = postSchema.validate(req.body);
+  const { error } = MenuProductValidationSchema.validate(req.body);
   if (error) {
     throw new BadRequestError(error.details[0].message);
   }
   next();
 };
 const validateMenuProductPut = (req, res, next) => {
-  const { error } = putSchema.validate(req.body);
+  const { error } = MenuProductValidationSchema.validate(req.body);
   if (error) {
     throw new BadRequestError(error.details[0].message);
   }

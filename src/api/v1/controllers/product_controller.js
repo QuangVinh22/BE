@@ -21,10 +21,6 @@ module.exports = {
     const fullPath = req.file.path;
     const fileName = path.basename(fullPath);
 
-    const product = req.body;
-    if (!fileName) {
-      throw new BadRequestError("Upload FIle failed");
-    }
     new CREATED({
       message: "Created  ",
       metadata: await createProductsService(req.body, fileName, UserId),
@@ -32,13 +28,12 @@ module.exports = {
   },
   putProductController: async (req, res, next) => {
     const UserId = req.payload.userId;
-    const fullPath = req.file.path;
-    const fileName = path.basename(fullPath);
-
-    const product = req.body;
-    if (!fileName) {
-      throw new BadRequestError("Upload FIle failed");
+    let fileName;
+    if (req.file) {
+      const fullPath = req.file.path;
+      fileName = path.basename(fullPath);
     }
+
     new OK({
       message: " Products Updated: ",
       metadata: await putProductService(req.body, fileName, UserId),

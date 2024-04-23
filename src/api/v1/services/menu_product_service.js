@@ -28,12 +28,31 @@ module.exports = {
       skip: skip,
       take: pageSize,
       where,
+      include: {
+        users_menu_products_created_byTousers: true, // Bao gồm thông tin người dùng đã tạo
+        users_menu_products_updated_byTousers: true,
+      },
     });
-    Menu_Products = Menu_Products.map((menu_product) => ({
-      ...menu_product,
-      created_time: format(new Date(menu_product.created_time), "MM-dd-yyyy "),
-      updated_time: format(new Date(menu_product.updated_time), "MM-dd-yyyy "),
-    }));
+    Menu_Products = Menu_Products.map((menu_product) => {
+      const formatMenuProducts = {
+        ...menu_product,
+        created_time: format(
+          new Date(menu_product.created_time),
+          "MM-dd-yyyy "
+        ),
+        updated_time: format(
+          new Date(menu_product.updated_time),
+          "MM-dd-yyyy "
+        ),
+        created_by: menu_product.users_menu_products_created_byTousers.username,
+        updated_by: menu_product.users_menu_products_updated_byTousers
+          ? menu_product.users_menu_products_updated_byTousers.username
+          : "Not yet updated",
+      };
+      delete formatMenuProducts.users_menu_products_created_byTousers;
+      delete formatMenuProducts.users_menu_products_updated_byTousers;
+      return formatMenuProducts;
+    });
     //
     if (Menu_Products.length === 0) {
       return [];

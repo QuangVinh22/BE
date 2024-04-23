@@ -12,7 +12,40 @@ const {
 } = require("../../middleware/validate/validateReferencer");
 const { buildWhereClause } = require("../../utils/searchUtils");
 const { format } = require("date-fns");
+const { id } = require("date-fns/locale");
 module.exports = {
+  getListTableServiceId: async (queryParams) => {
+    const { filterField, operator, value, page, limit } = queryParams;
+
+    // Fetch all with pagination
+    const pageNum = parseInt(page) || 1; // Mặc định là trang 1 nếu không được cung cấp
+    const pageSize = parseInt(limit) || 10; // Mặc định 10 sản phẩm mỗi trang nếu không được cung cấp
+    const skip = (pageNum - 1) * pageSize;
+    const where = await buildWhereClause({ filterField, operator, value });
+
+    let Table = await prisma.tables.findMany({
+      skip: skip,
+      take: pageSize,
+      where,
+      select: {
+        id: true,
+        table_numbers: true,
+      },
+    });
+    Table = Table.map((table) => {
+      const formatTable = {
+        ...table,
+        table_numbers: "bàn " + table.table_numbers,
+      };
+      delete formatTable.floors;
+      return formatTable;
+    });
+
+    if (Table.length === 0) {
+      return [];
+    }
+    return Table;
+  },
   getTableService: async (queryParams) => {
     const { filterField, operator, value, page, limit } = queryParams;
 
@@ -26,12 +59,20 @@ module.exports = {
       skip: skip,
       take: pageSize,
       where,
+      include: {
+        floors: true,
+      },
     });
-    Table = Table.map((table) => ({
-      ...table,
-      created_time: format(new Date(table.created_time), "MM-dd-yyyy "),
-      updated_time: format(new Date(table.updated_time), "MM-dd-yyyy "),
-    }));
+    Table = Table.map((table) => {
+      const formatTable = {
+        ...table,
+        created_time: format(new Date(table.created_time), "MM-dd-yyyy "),
+        updated_time: format(new Date(table.updated_time), "MM-dd-yyyy "),
+        floor_id: table.floors.floor_name,
+      };
+      delete formatTable.floors;
+      return formatTable;
+    });
     //
     if (Table.length === 0) {
       return [];

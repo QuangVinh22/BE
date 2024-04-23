@@ -24,15 +24,31 @@ module.exports = {
       skip: skip,
       take: pageSize,
       where,
+      include: {
+        users_products_created_byTousers: true, // Bao gồm thông tin người dùng đã tạo
+        users_products_updated_byTousers: true,
+      },
     });
-    products = products.map((product) => ({
-      ...product,
-      image: product.image
-        ? `http://localhost:8080/images/${product.image}`
-        : null,
-      created_time: format(new Date(product.created_time), "MM-dd-yyyy "),
-      updated_time: format(new Date(product.updated_time), "MM-dd-yyyy "),
-    }));
+
+    products = products.map((product) => {
+      const formatProduct = {
+        ...product,
+        image: product.image
+          ? `http://localhost:8080/images/${product.image}`
+          : null,
+        created_time: format(new Date(product.created_time), "MM-dd-yyyy "),
+        updated_time: product.updated_by
+          ? format(new Date(product.updated_time), "MM-dd-yyyy ")
+          : "Not Yet Updated",
+        created_by: product.users_products_created_byTousers.username,
+        updated_by: product.users_products_updated_byTousers
+          ? product.users_products_updated_byTousers.username
+          : "Not yet updated",
+      };
+      delete formatProduct.users_products_created_byTousers;
+      delete formatProduct.users_products_updated_byTousers;
+      return formatProduct;
+    });
     //
     if (products.length === 0) {
       return [];
@@ -40,9 +56,12 @@ module.exports = {
     return products;
   },
   createProductsService: async (product, imagePath, userId) => {
-    const vatAmount = product.price * (product.vat / 100);
+    const vatAmount =
+      parseFloat(product.price) * (parseFloat(product.vat) / 100);
+
     //tính tiền sau thuế
-    const cost = product.price + vatAmount;
+    const cost = parseFloat(product.price) + parseFloat(vatAmount);
+
     const newProduct = await prisma.products.create({
       data: {
         name: product.name,
@@ -55,32 +74,40 @@ module.exports = {
         status: true,
       },
     });
+
     return newProduct;
   },
   putProductService: async (ProductData, imagePath, userId) => {
-    //Vì đỏi sang xài form-date nên cần phải ép kiểu
-    //
+    console.log(ProductData);
     // Check coi product cần update có tồn tại k
+
     await validateRefProduct(parseInt(ProductData.id));
-    //Tính tiền sau thuế
 
-    const vatAmount = ProductData.price * (ProductData.vat / 100);
-    const cost = ProductData.price + vatAmount;
+    //Tính Thuế
+    const vatAmount =
+      parseFloat(ProductData.price) * (parseFloat(ProductData.vat) / 100);
+    //tính tiền sau thuế
+    const cost = parseFloat(ProductData.price) + parseFloat(vatAmount);
+    //Nếu Ko có ảnh thì update các trường này
+    const dataToUpdate = {
+      name: ProductData.name,
+      description: ProductData.description,
+      price: parseFloat(ProductData.price),
+      vat: parseFloat(ProductData.vat),
+      cost,
+      updated_by: userId,
+    };
 
+    if (imagePath) {
+      // Only add image path if provided
+      dataToUpdate.image = imagePath;
+    }
+    //
     const updateProduct = await prisma.products.update({
-      where: {
-        id: parseInt(ProductData.id),
-      },
-      data: {
-        name: ProductData.name,
-        description: ProductData.description,
-        image: imagePath,
-        price: parseFloat(ProductData.price),
-        vat: parseFloat(ProductData.vat),
-        cost: parseFloat(cost),
-        updated_by: userId,
-      },
+      where: { id: parseInt(ProductData.id) },
+      data: dataToUpdate,
     });
+
     return updateProduct;
   },
   deleteProductService: async (id, userId) => {
@@ -108,6 +135,7 @@ module.exports = {
         status: !Product.status,
       },
     });
+
     return updateProduct;
   },
 };

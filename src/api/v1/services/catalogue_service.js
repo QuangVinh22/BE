@@ -24,13 +24,26 @@ module.exports = {
       skip: skip,
       take: pageSize,
       where,
+      include: {
+        users_catalogue_created_byTousers: true, // Bao gồm thông tin người dùng đã tạo
+        users_catalogue_updated_byTousers: true,
+      },
     });
-    catalogue = catalogue.map((cata) => ({
-      ...cata,
-      image: cata.image ? `http://localhost:8080/images/${cata.image}` : null,
-      created_time: format(new Date(cata.created_time), "MM-dd-yyyy "),
-      updated_time: format(new Date(cata.updated_time), "MM-dd-yyyy "),
-    }));
+    catalogue = catalogue.map((cata) => {
+      const formarCatalogue = {
+        ...cata,
+        image: cata.image ? `http://localhost:8080/images/${cata.image}` : null,
+        created_time: format(new Date(cata.created_time), "MM-dd-yyyy "),
+        updated_time: format(new Date(cata.updated_time), "MM-dd-yyyy "),
+        created_by: cata.users_catalogue_created_byTousers.username,
+        updated_by: cata.users_catalogue_updated_byTousers
+          ? cata.users_catalogue_updated_byTousers.username
+          : "Not yet updated",
+      };
+      delete formarCatalogue.users_catalogue_created_byTousers;
+      delete formarCatalogue.users_catalogue_updated_byTousers;
+      return formarCatalogue;
+    });
     //
     if (catalogue.length === 0) {
       return [];
@@ -40,6 +53,7 @@ module.exports = {
   createCataloguesService: async (Catalogue, imagePath, UserId) => {
     //check CreatedBy isExist
     //imagePath
+
     const newCatalogue = await prisma.catalogue.create({
       data: {
         description: Catalogue.description,
@@ -48,6 +62,7 @@ module.exports = {
         status: true,
       },
     });
+
     return newCatalogue;
   },
   putCatalogueService: async (CatalogueData, imagePath, UserId) => {

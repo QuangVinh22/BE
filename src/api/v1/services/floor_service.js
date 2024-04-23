@@ -12,6 +12,47 @@ const {
 const { buildWhereClause } = require("../../utils/searchUtils");
 const { format } = require("date-fns");
 module.exports = {
+  getListFloorIdService: async (queryParams) => {
+    const { filterField, operator, value, page, limit } = queryParams;
+
+    // Fetch all with pagination
+    const pageNum = parseInt(page) || 1; // Mặc định là trang 1 nếu không được cung cấp
+    const pageSize = parseInt(limit) || 10; // Mặc định 10 sản phẩm mỗi trang nếu không được cung cấp
+    const skip = (pageNum - 1) * pageSize;
+    const where = await buildWhereClause({ filterField, operator, value });
+
+    let Floors = await prisma.floors.findMany({
+      skip: skip,
+      take: pageSize,
+      where,
+      select: {
+        id: true,
+        floor_name: true,
+      },
+    });
+    // Floors = Floors.map((floor) => {
+    //   const formatFloor = {
+    //     ...floor,
+    //     image: floor.image
+    //       ? `http://localhost:8080/images/${floor.image}`
+    //       : null,
+    //     created_time: format(new Date(floor.created_time), "MM-dd-yyyy "),
+    //     updated_time: format(new Date(floor.updated_time), "MM-dd-yyyy "),
+    //     created_by: floor.users_floors_created_byTousers.username,
+    //     updated_by: floor.users_floors_created_byTousers
+    //       ? floor.users_floors_created_byTousers.username
+    //       : "Not yet updated",
+    //   };
+    //   delete formatFloor.users_floors_created_byTousers;
+    //   delete formatFloor.users_floors_updated_byTousers;
+    //   return formatFloor;
+    // });
+    //
+    if (Floors.length === 0) {
+      return [];
+    }
+    return Floors;
+  },
   getFloorService: async (queryParams) => {
     const { filterField, operator, value, page, limit } = queryParams;
 
@@ -25,12 +66,28 @@ module.exports = {
       skip: skip,
       take: pageSize,
       where,
+      include: {
+        users_floors_created_byTousers: true, // Bao gồm thông tin người dùng đã tạo
+        users_floors_updated_byTousers: true,
+      },
     });
-    Floors = Floors.map((floor) => ({
-      ...floor,
-      created_time: format(new Date(floor.created_time), "MM-dd-yyyy "),
-      updated_time: format(new Date(floor.updated_time), "MM-dd-yyyy "),
-    }));
+    Floors = Floors.map((floor) => {
+      const formatFloor = {
+        ...floor,
+        image: floor.image
+          ? `http://localhost:8080/images/${floor.image}`
+          : null,
+        created_time: format(new Date(floor.created_time), "MM-dd-yyyy "),
+        updated_time: format(new Date(floor.updated_time), "MM-dd-yyyy "),
+        created_by: floor.users_floors_created_byTousers.username,
+        updated_by: floor.users_floors_created_byTousers
+          ? floor.users_floors_created_byTousers.username
+          : "Not yet updated",
+      };
+      delete formatFloor.users_floors_created_byTousers;
+      delete formatFloor.users_floors_updated_byTousers;
+      return formatFloor;
+    });
     //
     if (Floors.length === 0) {
       return [];
@@ -51,8 +108,17 @@ module.exports = {
         created_by: UserId,
         status: Floor.status,
       },
+      include: {
+        users_floors_created_byTousers: true, // Bao gồm thông tin người dùng đã tạo
+      },
     });
-    return newFloor;
+    const floorResponse = {
+      ...newFloor,
+      created_by: newFloor.users_floors_created_byTousers.username, // Thay thế ID bằng username
+    };
+    delete floorResponse.users_floors_created_byTousers;
+
+    return floorResponse;
   },
   putFloorService: async (FloorData, UserId) => {
     //check chi nhánh
@@ -70,8 +136,17 @@ module.exports = {
         description: FloorData.description,
         updated_by: UserId,
       },
+      include: {
+        users_floors_updated_byTousers: true, // Bao gồm thông tin người dùng đã tạo
+      },
     });
-    return updateFloor;
+    const floorResponse = {
+      ...updateFloor,
+      updated_by: updateFloor.users_floors_updated_byTousers.username, // Thay thế ID bằng username
+    };
+    delete floorResponse.users_floors_updated_byTousers;
+
+    return floorResponse;
   },
   //soft deleted
   deleteFloorService: async (id, UserId) => {
@@ -94,8 +169,17 @@ module.exports = {
         updated_by: UserId,
         status: !holderFloor.status,
       },
+      include: {
+        users_floors_updated_byTousers: true, // Bao gồm thông tin người dùng đã tạo
+      },
     });
-    return updateFloor;
+    const floorResponse = {
+      ...updateFloor,
+      updated_by: updateFloor.users_floors_updated_byTousers.username, // Thay thế ID bằng username
+    };
+    delete floorResponse.users_floors_updated_byTousers;
+
+    return floorResponse;
   },
   //   deleteProductService: async (FloorData) => {
   //     const existingProduct = await prisma.Floors.findUnique({

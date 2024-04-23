@@ -20,7 +20,6 @@ const { upload } = require("../../utils/imageUtils");
 OrderRoutes.post(
   "/post",
   verifyAccessToken,
-  upload.single("image"),
   checkRolePermission("Create"),
   validateOrdersPost,
   asyncHandler(postOrderController)
@@ -34,7 +33,6 @@ OrderRoutes.get(
 OrderRoutes.put(
   "/put",
   verifyAccessToken,
-  upload.single("image"),
   checkRolePermission("Update"),
   validateOrdersPut,
   asyncHandler(putOrderController)

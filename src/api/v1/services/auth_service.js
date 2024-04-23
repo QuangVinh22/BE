@@ -39,7 +39,7 @@ module.exports = {
   },
   LoginUserService: async (user) => {
     // Giả sử userValidate là một hàm bạn đã định nghĩa để validate thông tin người dùng// Bạn cần cung cấp định nghĩa cho hàm này
-
+    console.log(user);
     // Tìm người dùng dựa trên email thay vì username (tùy thuộc vào schema của bạn)
     const foundUser = await prisma.users.findUnique({
       where: {

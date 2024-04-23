@@ -27,6 +27,10 @@ model users {
   floors_floors_created_byTousers                              floors[]           @relation("floors_created_byTousers")
   floors_floors_updated_byTousers                              floors[]           @relation("floors_updated_byTousers")
   franchise                                                    franchise[]
+  franchisesCreatedBy                   franchise[]   @relation("franchise_created_by")
+  franchisesUpdatedBy                   franchise[]   @relation("franchise_updated_by")
+  ordersCreated        orders[]        @relation("orders_created_by")
+  ordersUpdated        orders[]        @relation("orders_updated_by")
   menu_products_menu_products_created_byTousers                menu_products[]    @relation("menu_products_created_byTousers")
   menu_products_menu_products_updated_byTousers                menu_products[]    @relation("menu_products_updated_byTousers")
   menu_role_menu_role_created_byTousers                        menu_role[]        @relation("menu_role_created_byTousers")
@@ -72,7 +76,6 @@ model floors {
   users_floors_created_byTousers           users?      @relation("floors_created_byTousers", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_floors_created_by")
   franchise_floors_franchise_idTofranchise franchise?  @relation("floors_franchise_idTofranchise", fields: [franchise_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_floors_franchise")
   users_floors_updated_byTousers           users?      @relation("floors_updated_byTousers", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_floors_updated_by")
-  franchise_franchise_floor_idTofloors     franchise[] @relation("franchise_floor_idTofloors")
   orders                                   orders[]
   tables                                   tables[]
 }
@@ -80,20 +83,23 @@ model floors {
 model franchise {
   id                                    Int       @id @default(autoincrement())
   user_id                               Int
-  floor_id                              Int
   name                                  String    @db.VarChar
   address                               String   @db.VarChar
   phone_number                          String   @db.VarChar
+  floors floors[]  @relation("floors_franchise_idTofranchise")
   updated_time                          DateTime? @db.Timestamp(6) @updatedAt
   created_time                          DateTime @db.Timestamp(6) @default(now())
   updated_by                            Int?
   created_by                            Int
   status                                Boolean
-  floors_floors_franchise_idTofranchise floors[]  @relation("floors_franchise_idTofranchise")
-  floors_franchise_floor_idTofloors     floors?   @relation("franchise_floor_idTofloors", fields: [floor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_franchise_floor")
+  
+
   users                                 users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_franchise_user")
+  createdByUser                         users     @relation("franchise_created_by", fields: [created_by], references: [id])
+  updatedByUser                         users?    @relation("franchise_updated_by", fields: [updated_by], references: [id])
   orders                                orders[]
   qr_role                               qr_role[]
+
 }
 
 model menu_products {
@@ -145,12 +151,16 @@ model orders {
   created_by           Int
 
   status               Boolean
+   createdByUser        users           @relation("orders_created_by", fields: [created_by], references: [id])
+  updatedByUser        users?          @relation("orders_updated_by", fields: [updated_by], references: [id])
   floors               floors?         @relation(fields: [floor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_floor")
   franchise            franchise?      @relation(fields: [franchise_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_franchise")
   payment_method       payment_method? @relation(fields: [payment_method_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_payment_method")
   tables               tables?         @relation(fields: [table_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_table")
   orders_detail        orders_detail[]
   qr                   qr[]
+  //
+
 }
 
 model orders_detail {

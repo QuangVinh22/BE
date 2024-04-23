@@ -7,6 +7,7 @@ const {
   getTableController,
   putTableController,
   deleteTableController,
+  getListIdTableController,
 } = require("../controllers/table_controller");
 const {
   validateTablesPost,
@@ -23,7 +24,7 @@ TableRoutes.post(
   verifyAccessToken,
   checkRolePermission("Create"),
   validateTablesPost,
-  checkMenuRolePermission(),
+  // checkMenuRolePermission(),
   asyncHandler(postTableController)
 );
 TableRoutes.get(
@@ -32,6 +33,13 @@ TableRoutes.get(
   checkRolePermission("Read"),
   asyncHandler(getTableController)
 );
+TableRoutes.get(
+  "/getListId",
+  verifyAccessToken,
+  checkRolePermission("Read"),
+  asyncHandler(getListIdTableController)
+);
+
 TableRoutes.put(
   "/put",
   verifyAccessToken,

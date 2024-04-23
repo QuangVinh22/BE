@@ -4,6 +4,7 @@ const {
   createFranchisesService,
   putFranchiseService,
   deleteFranchiseService,
+  getListFranchiseIdService,
 } = require("../services/franchise_service.js");
 module.exports = {
   getFranchiseController: async (req, res, next) => {
@@ -12,6 +13,13 @@ module.exports = {
       metadata: await getFranchiseService(req.query),
     }).send(res);
   },
+  getListFranchiseIdController: async (req, res, next) => {
+    new OK({
+      message: "List Franchises: ",
+      metadata: await getListFranchiseIdService(req.query),
+    }).send(res);
+  },
+
   postFranchiseController: async (req, res, next) => {
     const UserId = req.payload.userId;
     new CREATED({

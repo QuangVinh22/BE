@@ -6,6 +6,7 @@ const {
   postFloorController,
   getFloorController,
   putFloorController,
+  getListFloorIdController,
   deleteFloorController,
 } = require("../controllers/floor_controller");
 const {
@@ -28,6 +29,12 @@ FloorRoutes.get(
   verifyAccessToken,
   checkRolePermission("Read"),
   asyncHandler(getFloorController)
+);
+FloorRoutes.get(
+  "/getListFloorId",
+  verifyAccessToken,
+  checkRolePermission("Read"),
+  asyncHandler(getListFloorIdController)
 );
 FloorRoutes.put(
   "/put",

@@ -19,7 +19,7 @@ const CataloguePostSchema = Joi.object({
 });
 const validateCataloguePutSchema = Joi.object({
   id: Joi.number().required(),
-  description: Joi.string().min(5).max(50).required().messages({
+  description: Joi.string().min(5).max(50).messages({
     "string.base": `"Description" must be a string.`,
     "string.min": `"Description" must be at least 5 characters long.`,
     "string.max": `"Description" must not exceed 50 characters.`,
@@ -28,7 +28,7 @@ const validateCataloguePutSchema = Joi.object({
     "string.base": `"Image" must be a string.`,
     "string.uri": `"Image" must be a valid URL.`,
   }),
-  status: Joi.boolean().required().messages({
+  status: Joi.boolean().messages({
     "boolean.base": `"Status" must be true or false.`,
     "any.required": `"Status" is a required field.`,
   }),

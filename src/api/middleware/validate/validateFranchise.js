@@ -8,11 +8,6 @@ const validateFranchisePost = (req, res, next) => {
       "number.integer": `"User ID" must be an integer.`,
       "any.required": `"User ID" is a required field.`,
     }),
-    floor_id: Joi.number().integer().required().messages({
-      "number.base": `"Floor ID" must be a number.`,
-      "number.integer": `"Floor ID" must be an integer.`,
-      "any.required": `"Floor ID" is a required field.`,
-    }),
     name: Joi.string().required().messages({
       "string.base": `"Name" must be a string.`,
       "any.required": `"Name" is a required field.`,

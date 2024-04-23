@@ -7,6 +7,7 @@ const {
   getFranchiseController,
   putFranchiseController,
   deleteFranchiseController,
+  getListFranchiseIdController,
 } = require("../controllers/franchise_controller");
 const {
   validateFranchisePut,
@@ -30,6 +31,13 @@ FranchiseRoutes.get(
   checkRolePermission("Read"),
   asyncHandler(getFranchiseController)
 );
+FranchiseRoutes.get(
+  "/getListId",
+  verifyAccessToken,
+  checkRolePermission("Read"),
+  asyncHandler(getListFranchiseIdController)
+);
+
 FranchiseRoutes.put(
   "/put",
   verifyAccessToken,

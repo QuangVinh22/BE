@@ -4,6 +4,7 @@ const {
   createFloorsService,
   putFloorService,
   deleteFloorService,
+  getListFloorIdService,
 } = require("../services/floor_service.js");
 module.exports = {
   getFloorController: async (req, res, next) => {
@@ -12,6 +13,13 @@ module.exports = {
       metadata: await getFloorService(req.query),
     }).send(res);
   },
+  getListFloorIdController: async (req, res, next) => {
+    new OK({
+      message: "List Floors: ",
+      metadata: await getListFloorIdService(req.query),
+    }).send(res);
+  },
+
   postFloorController: async (req, res, next) => {
     const UserId = req.payload.userId;
     new CREATED({

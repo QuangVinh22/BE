@@ -59,9 +59,6 @@ module.exports = {
     }
   },
   validateRefProduct: async (id) => {
-    if (id == String) {
-      
-    }
     const isExistProduct = await prisma.products.findUnique({
       where: { id: id },
       select: {

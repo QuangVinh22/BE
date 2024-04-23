@@ -27,12 +27,22 @@ module.exports = {
       skip,
       take: pageSize,
       where,
+      include: {
+        role_users_role_idTorole: true,
+      },
     });
-    users = users.map((user) => ({
-      ...user,
-      created_time: format(new Date(user.created_time), "MM-dd-yyyy "),
-      updated_time: format(new Date(user.updated_time), "MM-dd-yyyy "),
-    }));
+    users = users.map((user) => {
+      const formatUser = {
+        ...user,
+        created_time: format(new Date(user.created_time), "MM-dd-yyyy "),
+        updated_time: format(new Date(user.updated_time), "MM-dd-yyyy "),
+        updated_by: user.updated_by ? user.username : "Not update Yet ",
+        created_by: user.username,
+        role_id: user.role_users_role_idTorole.name,
+      };
+      delete formatUser.role_users_role_idTorole;
+      return formatUser;
+    });
     //
     if (users.length === 0) {
       return [];
@@ -54,7 +64,6 @@ module.exports = {
       },
       data: {
         username: UserData.username,
-        franchies_id: UserData.franchies_id,
         role_id: UserData.role_id,
         password: UserData.password,
         updated_by: UserData.updated_by,
