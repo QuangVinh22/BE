@@ -51,7 +51,7 @@ TableRoutes.delete(
   "/delete/:id",
   verifyAccessToken,
   checkRolePermission("Delete"),
-  checkMenuRolePermission(),
+
   asyncHandler(deleteTableController)
 );
 

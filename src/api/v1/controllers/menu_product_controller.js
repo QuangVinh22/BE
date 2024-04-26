@@ -4,6 +4,7 @@ const {
   getMenuProductsService,
   putMenuProductService,
   deleteMenuProductService,
+  getMenuProductsByCatalogueService,
 } = require("../services/menu_product_service.js");
 module.exports = {
   getMenuProductController: async (req, res, next) => {
@@ -12,6 +13,13 @@ module.exports = {
       metadata: await getMenuProductsService(req.query),
     }).send(res);
   },
+  getMenuProductByCatalogueController: async (req, res, next) => {
+    new OK({
+      message: "List Products: ",
+      metadata: await getMenuProductsByCatalogueService(req.query),
+    }).send(res);
+  },
+
   postMenuProductController: async (req, res, next) => {
     const UserId = req.payload.userId;
     new CREATED({

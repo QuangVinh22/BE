@@ -56,12 +56,14 @@ module.exports = {
     return products;
   },
   createProductsService: async (product, imagePath, userId) => {
+    console.log(product);
     const vatAmount =
       parseFloat(product.price) * (parseFloat(product.vat) / 100);
 
     //tính tiền sau thuế
     const cost = parseFloat(product.price) + parseFloat(vatAmount);
-
+    try {
+    } catch (error) {}
     const newProduct = await prisma.products.create({
       data: {
         name: product.name,

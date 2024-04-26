@@ -5,6 +5,7 @@ const {
   postMenuProductController,
   getMenuProductController,
   putMenuProductController,
+  getMenuProductByCatalogueController,
 
   deleteMenuProductController,
 } = require("../controllers/menu_product_controller");
@@ -27,6 +28,12 @@ MenuProductRoutes.get(
   verifyAccessToken,
   checkRolePermission("Read"),
   asyncHandler(getMenuProductController)
+);
+MenuProductRoutes.get(
+  "/getByCatalogue",
+  verifyAccessToken,
+  checkRolePermission("Read"),
+  asyncHandler(getMenuProductByCatalogueController)
 );
 MenuProductRoutes.put(
   "/put",

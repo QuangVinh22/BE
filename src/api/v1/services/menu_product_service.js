@@ -15,6 +15,51 @@ const {
 const { buildWhereClause } = require("../../utils/searchUtils");
 const { format } = require("date-fns");
 module.exports = {
+  getMenuProductsByCatalogueService: async (queryParams) => {
+    const { filterField, operator, value, page, limit } = queryParams;
+
+    // Fetch all with pagination
+    const pageNum = parseInt(page) || 1; // Mặc định là trang 1 nếu không được cung cấp
+    const pageSize = parseInt(limit) || 10; // Mặc định 10 sản phẩm mỗi trang nếu không được cung cấp
+    const skip = (pageNum - 1) * pageSize;
+    const where = await buildWhereClause({ filterField, operator, value });
+
+    let Menu_Products = await prisma.menu_products.findMany({
+      skip: skip,
+      take: pageSize,
+      where,
+      select: {
+        id: true,
+        name: true,
+        product_id: true,
+        catalogue_id: true,
+        status: true,
+        products: {
+          select: {
+            name: true,
+            price: true,
+          },
+        },
+        catalogue: {
+          select: {
+            description: true,
+          },
+        },
+      },
+    });
+    Menu_Products = Menu_Products.map((menu_product) => {
+      const formatMenuProducts = {
+        ...menu_product,
+        product_id: menu_product.products,
+      };
+      return formatMenuProducts;
+    });
+    //
+    if (Menu_Products.length === 0) {
+      return [];
+    }
+    return Menu_Products;
+  },
   getMenuProductsService: async (queryParams) => {
     const { filterField, operator, value, page, limit } = queryParams;
 
@@ -31,6 +76,7 @@ module.exports = {
       include: {
         users_menu_products_created_byTousers: true, // Bao gồm thông tin người dùng đã tạo
         users_menu_products_updated_byTousers: true,
+        products: true,
       },
     });
     Menu_Products = Menu_Products.map((menu_product) => {
