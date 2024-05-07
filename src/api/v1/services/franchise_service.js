@@ -108,7 +108,6 @@ module.exports = {
     //Validate quản lý chi nhánh này có hợp lệ k
     await validatedUserId(Franchise.user_id);
     //check floor Tham chieu co dung k
-    await validateRefFloor(Franchise.floor_id);
     //
 
     const newFranchise = await prisma.franchise.create({
