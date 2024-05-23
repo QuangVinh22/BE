@@ -12,6 +12,7 @@ const {
   validatedUpdatedBy,
   validateRefQR,
 } = require("../../middleware/validate/validateReferencer");
+const { generateQR } = require("../../utils/qrUtils");
 module.exports = {
   getQRService: async (queryParams) => {
     const { id, page, limit } = queryParams;
@@ -41,25 +42,20 @@ module.exports = {
 
     return QR;
   },
-  createQRsService: async (QR, userId) => {
-    const vatAmount = QR.price * (QR.vat / 100);
-    const cost = QR.price + vatAmount;
-    const totalAfterDiscount = cost - cost * (QR.discount / 100);
-    //check Order ID
-    await validateRefOrder(QR.order_id);
-    //checkTable
-    await validateRefTable(QR.table_id);
-    //CreatedBy
-
-    const newQR = await prisma.qr.create({
+  createQRsService: async (qrData, userId) => {
+    const cc = "../../utils/qr/";
+    const qr_Url = generateQR("http://localhost:8080/v1/order/get");
+    if (!qr_Url) throw BadRequestError("Có lỗi khi xảy ra vấn đề tạo mã QR");
+    const newQr = prisma.qr.create({
       data: {
-        order_id: QR.order_id,
-        table_id: QR.table_id,
+        order_id: qrData.order_id,
+        table_id: qrData.table_id,
         created_by: userId,
-        status: QR.status,
+        status: qrData.status,
       },
     });
-    return newQR;
+
+    return newQr;
   },
   putQRService: async (QRData, userId) => {
     const vatAmount = QRData.price * (QRData.vat / 100);

@@ -12,11 +12,8 @@ class Database {
       port: config.db.port,
       database: config.db.database,
       password: config.db.password,
-      ssl: {
-        rejectUnauthorized: true,
-        ca: caCert,
-      },
-      max: 20,
+      ssl: false,
+      max: 1000,
       idleTimeoutMillis: 30000, // Thời gian chờ trước khi một kết nối không hoạt động được đóng
       connectionTimeoutMillis: 2000, // Thời gian chờ kết nối tối đa
     });
