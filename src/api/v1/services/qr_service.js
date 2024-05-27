@@ -44,7 +44,7 @@ module.exports = {
   },
   createQRsService: async (qrData, userId) => {
     const cc = "../../utils/qr/";
-    const qr_Url = generateQR("http://localhost:8080/v1/order/get");
+    const qr_Url = generateQR("http://localhost:5173/ViewOrder");
     if (!qr_Url) throw BadRequestError("Có lỗi khi xảy ra vấn đề tạo mã QR");
     const newQr = prisma.qr.create({
       data: {

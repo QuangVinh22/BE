@@ -2,7 +2,8 @@ const express = require("express");
 const AuthRoutes = express.Router();
 const {
   AuthLoginController,
-  AuthRegisterController,refreshTokenController
+  AuthRegisterController,
+  refreshTokenController,
 } = require("../controllers/auth_controller");
 const asyncHandler = require("../../middleware/handleError");
 const {
@@ -16,7 +17,7 @@ AuthRoutes.post(
   "/register",
   verifyAccessToken,
 
-  checkRolePermission("Create"),
+  // checkRolePermission("Create"),
 
   asyncHandler(AuthRegisterController)
 );

@@ -11,7 +11,6 @@ const development = {
     port: process.env.DEV_APP_DB_PORT,
     database: process.env.DEV_APP_DB_NAME,
     password: process.env.DEV_APP_DB_PASSWORD,
-    ssl: false,
   },
 
   // Các cấu hình khác cho development...
@@ -27,7 +26,6 @@ const production = {
     port: process.env.PRO_APP_DB_PORT,
     database: process.env.PRO_APP_DB_NAME,
     password: process.env.PRO_APP_DB_PASSWORD,
-    ssl: false,
   },
   // Các cấu hình khác cho production...
 };

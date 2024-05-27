@@ -5,14 +5,10 @@ const generateQR = async (url) => {
   try {
     console.log("Generating QR code...");
     const qrImage = await QRCode.toDataURL(url);
-    console.log(qrImage);
-
     //
     const dirPath = path.join(__dirname, "../utils/qr");
     const filePath = path.join(dirPath, "qr.png");
 
-    console.log("Dẫn lồn: ", dirPath);
-    console.log("Dẫn lồn: ", filePath);
     fs.mkdirSync(dirPath, { recursive: true });
 
     // Lưu mã QR vào tệp sau khi sinh ra base64
@@ -36,4 +32,5 @@ const generateQR = async (url) => {
   }
 };
 module.exports = { generateQR };
+
 // Thay 'http://localhost:8080/v1/product/get' bằng URL mà bạn muốn tạo mã QR
