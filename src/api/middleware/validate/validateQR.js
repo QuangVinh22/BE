@@ -8,11 +8,6 @@ const validateQRPost = (req, res, next) => {
       "number.integer": `"Order ID" must be an integer.`,
       "any.required": `"Order ID" is a required field.`,
     }),
-    table_id: Joi.number().integer().required().messages({
-      "number.base": `"Table ID" must be a number.`,
-      "number.integer": `"Table ID" must be an integer.`,
-      "any.required": `"Table ID" is a required field.`,
-    }),
 
     status: Joi.boolean().required().messages({
       "boolean.base": `"Status" must be true or false.`,
@@ -36,10 +31,6 @@ const validateQRPut = (req, res, next) => {
     order_id: Joi.number().integer().optional().messages({
       "number.base": `"Order ID" must be a number.`,
       "number.integer": `"Order ID" must be an integer.`,
-    }),
-    table_id: Joi.number().integer().optional().messages({
-      "number.base": `"Table ID" must be a number.`,
-      "number.integer": `"Table ID" must be an integer.`,
     }),
 
     status: Joi.boolean().required().messages({

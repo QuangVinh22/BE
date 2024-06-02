@@ -60,7 +60,6 @@ app.use("/v1/user", UserRoutes);
 app.use("/v1/customer", CustomerRoutes);
 app.use("/images", express.static(path.join(__dirname, "/api/utils/images")));
 
-
 //Redis
 const client = require("./helpers/connect_redis");
 //

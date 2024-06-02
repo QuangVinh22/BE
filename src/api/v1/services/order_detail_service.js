@@ -26,11 +26,16 @@ module.exports = {
       skip: skip,
       take: pageSize,
       where,
+      include: {
+        products: true,
+      },
     });
     Order_Detail = Order_Detail.map((o_d) => ({
       ...o_d,
+
       created_time: format(new Date(o_d.created_time), "MM-dd-yyyy "),
       updated_time: format(new Date(o_d.updated_time), "MM-dd-yyyy "),
+      products: "Tên sản phẩm : " + o_d.products.name,
     }));
     //
     if (Order_Detail.length === 0) {

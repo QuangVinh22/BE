@@ -43,13 +43,20 @@ module.exports = {
     return QR;
   },
   createQRsService: async (qrData, userId) => {
-    const cc = "../../utils/qr/";
-    const qr_Url = generateQR("http://localhost:5173/ViewOrder");
-    if (!qr_Url) throw BadRequestError("Có lỗi khi xảy ra vấn đề tạo mã QR");
+    await validateRefOrder(qrData.order_id);
+    const holder_orderId = qrData.order_id;
+    const filePath = await generateQR(
+      `http://localhost:5173/ViewOrder/${holder_orderId}`,
+      holder_orderId
+    );
+
+    if (!filePath)
+      throw new BadRequestError("Có lỗi khi xảy ra vấn đề tạo mã QR");
     const newQr = prisma.qr.create({
       data: {
+        qr_url: filePath,
         order_id: qrData.order_id,
-        table_id: qrData.table_id,
+
         created_by: userId,
         status: qrData.status,
       },

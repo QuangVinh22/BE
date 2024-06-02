@@ -151,7 +151,7 @@ model orders {
   created_by           Int
 
   status               Boolean
-   createdByUser        users           @relation("orders_created_by", fields: [created_by], references: [id])
+  createdByUser        users           @relation("orders_created_by", fields: [created_by], references: [id])
   updatedByUser        users?          @relation("orders_updated_by", fields: [updated_by], references: [id])
   floors               floors?         @relation(fields: [floor_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_floor")
   franchise            franchise?      @relation(fields: [franchise_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_orders_franchise")
@@ -220,7 +220,7 @@ model products {
 model qr {
   id           Int       @id @default(autoincrement())
   order_id     Int
-  table_id     Int
+  table_id     Int?
   qr_url       String?   @db.VarChar(255) // Lưu URL của ảnh QR
   updated_time DateTime? @db.Timestamp(6)   @updatedAt
   created_time DateTime @db.Timestamp(6)   @default(now())
