@@ -219,7 +219,7 @@ model products {
 
 model qr {
   id           Int       @id @default(autoincrement())
-  order_id     Int
+  order_id     Int?
   table_id     Int?
   qr_url       String?   @db.VarChar(255) // Lưu URL của ảnh QR
   updated_time DateTime? @db.Timestamp(6)   @updatedAt

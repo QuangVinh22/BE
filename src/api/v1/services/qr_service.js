@@ -8,44 +8,47 @@ const {
 const {
   validateRefOrder,
   validateRefTable,
-  validateCreatedBy,
-  validatedUpdatedBy,
   validateRefQR,
+  validateRefFranchise,
+  validateRefFloor,
 } = require("../../middleware/validate/validateReferencer");
-const { generateQR } = require("../../utils/qrUtils");
+const { generateOrderQR, generateQrOnTable } = require("../../utils/qrUtils");
+const { format } = require("date-fns");
+const { buildWhereClause } = require("../../utils/searchUtils");
 module.exports = {
   getQRService: async (queryParams) => {
-    const { id, page, limit } = queryParams;
+    const { filterField, operator, value, page, limit } = queryParams;
 
     // Kiểm tra xem có truyền ID cụ thể không
-    if (id) {
-      // Fetch QR by ID
-      const holderQR = await prisma.qr.findUnique({
-        where: { id: parseInt(id) },
-      });
-      if (!holderQR) throw new BadRequestError("Id QR  không tồn tại");
-      return [holderQR]; // Trả về sản phẩm trong một mảng hoặc mảng rỗng nếu không tìm thấy
-    }
 
     // Fetch all with pagination
     const pageNum = parseInt(page) || 1; // Mặc định là trang 1 nếu không được cung cấp
     const pageSize = parseInt(limit) || 10; // Mặc định 10 sản phẩm mỗi trang nếu không được cung cấp
     const skip = (pageNum - 1) * pageSize;
-
-    const QR = await prisma.qr.findMany({
+    const where = await buildWhereClause({ filterField, operator, value });
+    let QR = await prisma.qr.findMany({
       skip: skip,
       take: pageSize,
-      where: {
-        status: true,
-      },
+      where,
     });
+    QR = QR.map((q_r) => {
+      const formatQR = {
+        ...q_r,
+        qr_url: q_r.qr_url ? `${q_r.qr_url}` : null,
+        created_time: format(new Date(q_r.created_time), "MM-dd-yyyy "),
+        updated_time: q_r.updated_by
+          ? format(new Date(product.updated_time), "MM-dd-yyyy ")
+          : "Not Yet Updated",
+      };
 
+      return formatQR;
+    });
     return QR;
   },
   createQRsService: async (qrData, userId) => {
     await validateRefOrder(qrData.order_id);
     const holder_orderId = qrData.order_id;
-    const filePath = await generateQR(
+    const filePath = await generateOrderQR(
       `http://localhost:5173/ViewOrder/${holder_orderId}`,
       holder_orderId
     );
@@ -64,10 +67,39 @@ module.exports = {
 
     return newQr;
   },
+  createQRsByTableService: async (qrData, userId) => {
+    console.log(qrData.table_id);
+    console.log(qrData.franchise_id);
+
+    console.log(qrData.floor_id);
+    if (qrData.table_id) await validateRefTable(qrData.table_id);
+    const holder_tableId = qrData.table_id;
+    if (qrData.franchise_id) await validateRefFranchise(qrData.franchise_id);
+    const holder_franchiseId = qrData.franchise_id;
+    if (qrData.floor_id) await validateRefFloor(qrData.floor_id);
+    const holder_floorId = qrData.floor_id;
+    const filePath = await generateQrOnTable(
+      `http://localhost:5173/${holder_tableId}/${holder_franchiseId}/${holder_floorId}`,
+      holder_franchiseId,
+      holder_floorId,
+      holder_tableId
+    );
+
+    if (!filePath)
+      throw new BadRequestError("Có lỗi khi xảy ra vấn đề tạo mã QR");
+    const newQr = prisma.qr.create({
+      data: {
+        qr_url: filePath,
+
+        table_id: qrData.table_id,
+        created_by: userId,
+        status: qrData.status,
+      },
+    });
+
+    return newQr;
+  },
   putQRService: async (QRData, userId) => {
-    const vatAmount = QRData.price * (QRData.vat / 100);
-    const cost = QRData.price + vatAmount;
-    const totalAfterDiscount = cost - cost * (QRData.discount / 100);
     //checkupdate
 
     //Order

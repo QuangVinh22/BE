@@ -6,6 +6,7 @@ const {
   postQRController,
   getQRController,
   putQRController,
+  postQRTableController,
   deleteQRController,
 } = require("../controllers/qr_controller");
 const {
@@ -22,6 +23,13 @@ QRRoutes.post(
   checkRolePermission("Create"),
   asyncHandler(postQRController)
 );
+QRRoutes.post(
+  "/postTable",
+  verifyAccessToken,
+  checkRolePermission("Create"),
+  asyncHandler(postQRTableController)
+);
+
 QRRoutes.get(
   "/get",
   verifyAccessToken,

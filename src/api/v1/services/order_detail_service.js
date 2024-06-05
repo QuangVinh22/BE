@@ -35,7 +35,7 @@ module.exports = {
 
       created_time: format(new Date(o_d.created_time), "MM-dd-yyyy "),
       updated_time: format(new Date(o_d.updated_time), "MM-dd-yyyy "),
-      products: "Tên sản phẩm : " + o_d.products.name,
+      products: o_d.products.name,
     }));
     //
     if (Order_Detail.length === 0) {

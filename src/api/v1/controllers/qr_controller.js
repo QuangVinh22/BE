@@ -4,6 +4,7 @@ const {
   createQRsService,
   putQRService,
   deleteQRService,
+  createQRsByTableService,
 } = require("../services/qr_service.js");
 module.exports = {
   getQRController: async (req, res, next) => {
@@ -17,6 +18,14 @@ module.exports = {
     new CREATED({
       message: "Created  ",
       metadata: await createQRsService(req.body, UserId),
+    }).send(res);
+  },
+  postQRTableController: async (req, res, next) => {
+    const UserId = req.payload.userId;
+
+    new CREATED({
+      message: "Created  ",
+      metadata: await createQRsByTableService(req.body, UserId),
     }).send(res);
   },
   putQRController: async (req, res, next) => {

@@ -3,7 +3,7 @@ const Joi = require("joi");
 
 const validateQRPost = (req, res, next) => {
   const postSchema = Joi.object({
-    order_id: Joi.number().integer().required().messages({
+    order_id: Joi.number().integer().messages({
       "number.base": `"Order ID" must be a number.`,
       "number.integer": `"Order ID" must be an integer.`,
       "any.required": `"Order ID" is a required field.`,
