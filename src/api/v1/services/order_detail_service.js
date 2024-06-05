@@ -28,15 +28,25 @@ module.exports = {
       where,
       include: {
         products: true,
+        users_orders_detail_created_byTousers: true,
+        users_orders_detail_updated_byTousers: true,
       },
     });
-    Order_Detail = Order_Detail.map((o_d) => ({
-      ...o_d,
-
-      created_time: format(new Date(o_d.created_time), "MM-dd-yyyy "),
-      updated_time: format(new Date(o_d.updated_time), "MM-dd-yyyy "),
-      products: o_d.products.name,
-    }));
+    Order_Detail = Order_Detail.map((o_d) => {
+      const formatOrderDetail = {
+        ...o_d,
+        created_by: o_d.users_orders_detail_created_byTousers.username,
+        updated_by: o_d.users_orders_detail_updated_byTousers
+          ? o_d.users_orders_detail_updated_byTousers.username
+          : "Not Yed Updated",
+        created_time: format(new Date(o_d.created_time), "MM-dd-yyyy "),
+        updated_time: format(new Date(o_d.updated_time), "MM-dd-yyyy "),
+        products: o_d.products.name,
+      };
+      delete formatOrderDetail.users_orders_detail_created_byTousers;
+      delete formatOrderDetail.users_orders_detail_updated_byTousers;
+      return formatOrderDetail;
+    });
     //
     if (Order_Detail.length === 0) {
       return [];
