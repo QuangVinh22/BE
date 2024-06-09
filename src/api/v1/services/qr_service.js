@@ -29,7 +29,13 @@ module.exports = {
     let QR = await prisma.qr.findMany({
       skip: skip,
       take: pageSize,
-      where,
+      where: {
+        status: true,
+      },
+      include: {
+        createdByUser: true,
+        updatedByUser: true,
+      },
     });
     QR = QR.map((q_r) => {
       const formatQR = {
@@ -37,9 +43,15 @@ module.exports = {
         qr_url: q_r.qr_url ? `${q_r.qr_url}` : null,
         created_time: format(new Date(q_r.created_time), "MM-dd-yyyy "),
         updated_time: q_r.updated_by
-          ? format(new Date(product.updated_time), "MM-dd-yyyy ")
+          ? format(new Date(q_r.updated_time), "MM-dd-yyyy ")
+          : "Not Yet Updated",
+        created_by: q_r.createdByUser.username,
+        updated_by: q_r.updatedByUser
+          ? q_r.updatedByUser.username
           : "Not Yet Updated",
       };
+      delete formatQR.createdByUser;
+      delete formatQR.updatedByUser;
 
       return formatQR;
     });

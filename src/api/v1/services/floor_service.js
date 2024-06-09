@@ -24,7 +24,9 @@ module.exports = {
     let Floors = await prisma.floors.findMany({
       skip: skip,
       take: pageSize,
-      where,
+      where: {
+        status: true,
+      },
       select: {
         id: true,
         floor_name: true,

@@ -27,7 +27,9 @@ module.exports = {
     let Menu_Products = await prisma.menu_products.findMany({
       skip: skip,
       take: pageSize,
-      where,
+      where: {
+        status: true,
+      },
       select: {
         id: true,
         name: true,

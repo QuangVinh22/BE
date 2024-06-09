@@ -22,6 +22,9 @@ model users {
 
   qr_roleUpdatedBy  qr_role[]          @relation("updatedByQrRole")
   qr_roleCreatedBy  qr_role[]          @relation("createdByQrRole")
+  qr_updatedByUser qr[]    @relation("updatedByQrRole")
+  qr_createdByUser qr[]   @relation("createdByQrRole")
+
   catalogue_catalogue_created_byTousers                        catalogue[]        @relation("catalogue_created_byTousers")
   catalogue_catalogue_updated_byTousers                        catalogue[]        @relation("catalogue_updated_byTousers")
   floors_floors_created_byTousers                              floors[]           @relation("floors_created_byTousers")
@@ -229,6 +232,9 @@ model qr {
   status       Boolean
   orders       orders?   @relation(fields: [order_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_qr_order")
   tables       tables?   @relation(fields: [table_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_qr_table")
+  updatedByUser users?    @relation("updatedByQrRole", fields: [updated_by], references: [id])
+  createdByUser users?    @relation("createdByQrRole", fields: [created_by], references: [id])
+
 }
 
 model qr_role {

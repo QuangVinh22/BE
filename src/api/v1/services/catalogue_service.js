@@ -23,7 +23,9 @@ module.exports = {
     let catalogue = await prisma.catalogue.findMany({
       skip: skip,
       take: pageSize,
-      where,
+      where: {
+        status: true,
+      },
       include: {
         users_catalogue_created_byTousers: true, // Bao gồm thông tin người dùng đã tạo
         users_catalogue_updated_byTousers: true,

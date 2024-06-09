@@ -69,7 +69,9 @@ module.exports = {
     let Franchises = await prisma.franchise.findMany({
       skip: skip,
       take: pageSize,
-      where,
+      where: {
+        status: true,
+      },
       include: {
         updatedByUser: true, // Bao gồm thông tin người dùng đã tạo
         createdByUser: true,

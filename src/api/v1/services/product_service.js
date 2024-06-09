@@ -23,7 +23,9 @@ module.exports = {
     let products = await prisma.products.findMany({
       skip: skip,
       take: pageSize,
-      where,
+      where: {
+        status: true,
+      },
       include: {
         users_products_created_byTousers: true, // Bao gồm thông tin người dùng đã tạo
         users_products_updated_byTousers: true,
@@ -56,7 +58,6 @@ module.exports = {
     return products;
   },
   createProductsService: async (product, imagePath, userId) => {
-    console.log(product);
     const vatAmount =
       parseFloat(product.price) * (parseFloat(product.vat) / 100);
 
@@ -80,7 +81,6 @@ module.exports = {
     return newProduct;
   },
   putProductService: async (ProductData, imagePath, userId) => {
-    console.log(ProductData);
     // Check coi product cần update có tồn tại k
 
     await validateRefProduct(parseInt(ProductData.id));

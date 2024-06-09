@@ -1,7 +1,7 @@
 const Joi = require("joi");
 const { BadRequestError } = require("../../core/error.response");
 const CataloguePostSchema = Joi.object({
-  description: Joi.string().min(5).max(50).required().messages({
+  description: Joi.string().min(2).max(50).required().messages({
     "string.base": `"Description" must be a string.`,
     "string.min": `"Description" must be at least 5 characters long.`,
     "string.max": `"Description" must not exceed 50 characters.`,
@@ -19,7 +19,7 @@ const CataloguePostSchema = Joi.object({
 });
 const validateCataloguePutSchema = Joi.object({
   id: Joi.number().required(),
-  description: Joi.string().min(5).max(50).messages({
+  description: Joi.string().min(2).max(50).messages({
     "string.base": `"Description" must be a string.`,
     "string.min": `"Description" must be at least 5 characters long.`,
     "string.max": `"Description" must not exceed 50 characters.`,

@@ -2,11 +2,6 @@ const { BadRequestError } = require("../../core/error.response"); // Giả sử 
 const Joi = require("joi");
 
 const MenuProductValidationSchema = Joi.object({
-  id: Joi.number().integer().required().messages({
-    "number.base": `"ID" must be a number.`,
-    "number.integer": `"ID" must be an integer.`,
-    "any.required": `"ID" is a required field.`,
-  }),
   name: Joi.string().max(50).required().messages({
     "string.base": `"Menu Product Name" must be a string.`,
     "string.max": `"Menu Product Name" must not exceed 50 characters.`,
