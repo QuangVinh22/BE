@@ -27,9 +27,7 @@ module.exports = {
     let Order = await prisma.orders.findMany({
       skip: skip,
       take: pageSize,
-      where: {
-        status: true,
-      },
+      where,
       include: {
         createdByUser: true, // Bao gồm thông tin người dùng đã tạo
         updatedByUser: true,

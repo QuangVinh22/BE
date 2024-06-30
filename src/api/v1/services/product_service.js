@@ -23,9 +23,7 @@ module.exports = {
     let products = await prisma.products.findMany({
       skip: skip,
       take: pageSize,
-      where: {
-        status: true,
-      },
+      where,
       include: {
         users_products_created_byTousers: true, // Bao gồm thông tin người dùng đã tạo
         users_products_updated_byTousers: true,
